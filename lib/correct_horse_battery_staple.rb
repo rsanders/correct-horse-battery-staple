@@ -5,7 +5,9 @@ require 'securerandom'
 #
 # Generate 
 #
-class WordPasswordMaker
+class CorrectHorseBatteryStaple
+  VERSION = '0.1.0'
+  
   def initialize(word_length, file=nil)
     @word_length = word_length
     @corpus = file || "/usr/share/dict/words"
@@ -28,6 +30,6 @@ class WordPasswordMaker
 end
 
 if __FILE__ == $0
-  puts WordPasswordMaker.new(3..6).
+  puts CorrectHorseBatteryStaple.new(3..6).
     make((ARGV[0] || 4).to_i)
 end
