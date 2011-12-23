@@ -75,7 +75,7 @@ total       = frequencies.reduce(BigDecimal.new("0"), :+)
 (mean, stddev)           = mean_and_standard_deviation(frequencies)
 
 puts "index,rank,word,frequency,percentile,distance,probability,distance_probability"
-words[1..20].each_with_index do |wstruct, index|
+words.each_with_index do |wstruct, index|
   word = wstruct.word
   freq = wstruct.frequency
   distance        = (freq-mean)/stddev
