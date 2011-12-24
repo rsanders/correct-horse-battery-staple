@@ -24,7 +24,8 @@ command :generate do |c|
     count = options.repeat.to_i
 
     corpus = CorrectHorseBatteryStaple.default_corpus
-
+    puts "loaded corpus!" if options.debug
+    
     if options.verbose
       puts "Entropy: 2^#{count * corpus.entropy_per_word.floor} bits"
     end
