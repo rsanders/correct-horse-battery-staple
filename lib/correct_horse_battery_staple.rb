@@ -2,14 +2,18 @@
 module CorrectHorseBatteryStaple
   VERSION = '0.1.0'
 
-  DEFAULT_CORPUS = "wiktionary"
+  DEFAULT_CORPUS_NAME = "wiktionary"
 
   def self.default_corpus
-    CorrectHorseBatteryStaple::Corpus.read_csv File.join(self.corpus_directory, "wiktionary.csv")
+    self.load_corpus DEFAULT_CORPUS_NAME
+  end
+
+  def self.load_corpus(corpus_name)
+    CorrectHorseBatteryStaple::Corpus.read_csv File.join(self.corpus_directory, "#{corpus_name}.csv")
   end
 
   def self.generate(length = 4)
-    CorrectHorseBatteryStaple::Generator.new(self.default_corpus).make(length)
+    CorrectHorseBatteryStaple::Generator.new(self.load_corpus(DEFAULT_CORPUS_NAME)).make(length)
   end
 
   protected

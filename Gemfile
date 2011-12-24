@@ -1,6 +1,7 @@
 source :rubygems
 
 gem "fastercsv"
+gem "commander"
 
 group :test do
   gem "rspec"

@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+
+require 'correct_horse_battery_staple'
+require 'commander/import'
+
+program :version, "0.1.0"
+program :description, "Correct Horse Battery Staple - XKCD-style Passphrases"
+
+global_option '-D', '--debug', 'Display full protocol trace'
+global_option '-V', '--verbose', 'Shows request and response'
+
+command :generate do |c|
+  c.syntax = 'generate [<number of words>]'
+  c.summary = 'Generate a passphrase with a given number of words'
+  #c.description = ''
+  #c.example 'description', 'command example'
+  c.option '--wordsize MIN..MAX', 'Set the allowed word size in # of characters'
+  c.option '-n COUNT', '--repeat COUNT', 'How many passwords to generate'
+  c.action do |args, options|
+    options.default :wordsize => "3..6", :repeat => 1
+
+    number_of_words = (args[0] || 4).to_i
+    wordsize = Range.new *options.wordsize.split('..').map {|x| x.to_i}
+    count = options.repeat.to_i
+
+    corpus = CorrectHorseBatteryStaple.default_corpus
+    count.times do
+      puts CorrectHorseBatteryStaple::Generator.new(corpus, wordsize).
+        make(number_of_words)
+    end
+  end
+end
+
+
+
