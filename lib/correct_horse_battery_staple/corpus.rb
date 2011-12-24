@@ -9,8 +9,6 @@ class CorrectHorseBatteryStaple::Corpus
   def initialize(table)
     @table   = table
     @filters = []
-
-    table.convert {|field, info| info.header == :word ? field.to_s : field }
   end
 
   def filter(&block)
