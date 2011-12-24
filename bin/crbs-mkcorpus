@@ -30,7 +30,7 @@ urls = ARGV
 
 words = urls.map do |url|
   parser_class.new.parse open(url)
-end.reduce(:+).sort
+end.reduce(:+).select {|wstruct| wstruct.word =~ /^[a-zA-Z]/ }.sort
 
 # total number of words
 count       = words.length
@@ -53,7 +53,7 @@ words.each_with_index do |wstruct, index|
   probability     = freq/total
   distance_prob   = (probability - prob_mean) / prob_stddev
   percentile      = (index-0.5)/count * 100
-  printf("%d,%d,%s,%d,%.4f,%.6f,%.8f,%.8f\n", index, wstruct.rank, word, freq,
+  printf("%d,%d,\"%s\",%d,%.4f,%.6f,%.8f,%.8f\n", index, wstruct.rank, word, freq,
     percentile, distance, probability * 100, distance_prob)
 end
 

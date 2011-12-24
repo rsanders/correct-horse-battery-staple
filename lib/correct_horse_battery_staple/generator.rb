@@ -26,8 +26,9 @@ class CorrectHorseBatteryStaple::Generator
 
   def words
     @words ||= @corpus.
-               filter {|entry| @word_length.include?(entry[:word].length) }.
-               words
+      filter {|entry| puts "#{entry.inspect}, word = #{entry[:word]}"; @word_length.include?(entry[:word].length)
+    }.
+      result[:word]
   end
 end
 
