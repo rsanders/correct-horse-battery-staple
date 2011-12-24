@@ -16,6 +16,10 @@ class CorrectHorseBatteryStaple::Corpus
     self
   end
 
+  def entropy_per_word
+    Math.log(length) / Math.log(2)
+  end
+  
   def reset
     @filters = []
   end
@@ -32,14 +36,16 @@ class CorrectHorseBatteryStaple::Corpus
     StatisticalArray.new(execute_filters.map {|row| row[:frequency]})
   end
 
+  def composed_filters(filters)
+    return nil if !filters || filters.empty?
+    filters.reduce {|prev, current| lambda {|value| prev.call(value) && current.call(value) } }
+  end
+
   protected
 
   def execute_filters
     return @table if @filters.nil? || @filters.empty?
-
-    @filters.reduce(@table) do |initial, filter|
-      FasterCSV::Table.new initial.select(&filter)
-    end
+    @table.select &composed_filters(@filters)
   ensure
     reset
   end

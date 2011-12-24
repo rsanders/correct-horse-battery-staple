@@ -24,6 +24,11 @@ command :generate do |c|
     count = options.repeat.to_i
 
     corpus = CorrectHorseBatteryStaple.default_corpus
+
+    if options.verbose
+      puts "Entropy: 2^#{count * corpus.entropy_per_word.floor} bits"
+    end
+
     count.times do
       puts CorrectHorseBatteryStaple::Generator.new(corpus, wordsize).
         make(number_of_words)
