@@ -8,3 +8,6 @@ class CorrectHorseBatteryStaple::Parser
   end
 
 end
+
+require 'correct_horse_battery_staple/parser/base'
+require 'correct_horse_battery_staple/parser/regex'

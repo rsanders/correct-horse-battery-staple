@@ -16,6 +16,10 @@ class CorrectHorseBatteryStaple::Corpus
     self
   end
 
+  def reset
+    @filters = []
+  end
+
   def words
     execute_filters.map {|row| row[:word]}
   end
@@ -24,16 +28,20 @@ class CorrectHorseBatteryStaple::Corpus
     self.class.new execute_filters
   end
 
+  def frequencies
+    StatisticalArray.new(execute_filters.map {|row| row[:frequency]})
+  end
+
   protected
 
   def execute_filters
     return @table if @filters.nil? || @filters.empty?
 
-    (filters, @filters) = [@filters, []]
-
-    filters.reduce(@table) do |initial, filter|
+    @filters.reduce(@table) do |initial, filter|
       FasterCSV::Table.new initial.select(&filter)
     end
+  ensure
+    reset
   end
 
   def method_missing(name, *args, &block)

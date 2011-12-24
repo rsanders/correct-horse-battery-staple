@@ -2,7 +2,7 @@
 class CorrectHorseBatteryStaple::Parser
   class Regex < Base
     PARSERS  = {
-        :wikitionary   =>  [%r{<a href="/wiki/\w+" title="(\w+)">\w+</a> = (\d+)},
+        :wiktionary   =>  [%r{<a href="/wiki/\w+" title="(\w+)">\w+</a> = (\d+)},
           lambda {|match, wstruct| wstruct.word = match[0]; wstruct.frequency = match[1].to_i }],
 
         # rank	lemma	PoS	freq	dispersion
@@ -12,19 +12,18 @@ class CorrectHorseBatteryStaple::Parser
     }
 
     def initialize(type = :wiktionary)
-      super
       @parser_type = type.to_sym
     end
 
     def parse(file)
-      raise ArgumentError, "unknown regex parser type #{file}" unless PARSERS.has_key?[@parser_type]
+      raise ArgumentError, "unknown regex parser type #{@parser_type}" unless PARSERS.has_key?(@parser_type)
       (regex, lexer) = PARSERS[@parser_type]
 
-      words = urls.map do |url|
+      words = 
         file.read.scan(regex).map do |pair|
            WStruct.new.tap {|w| lexer.call(pair, w) }
         end
-      end.reduce(:+)
+
     end
   end
 end
