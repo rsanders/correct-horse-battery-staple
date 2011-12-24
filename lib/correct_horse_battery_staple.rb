@@ -1,35 +1,29 @@
-#!/usr/bin/env ruby
 
-require 'securerandom'
-
-#
-# Generate 
-#
-class CorrectHorseBatteryStaple
+module CorrectHorseBatteryStaple
   VERSION = '0.1.0'
-  
-  def initialize(word_length, file=nil)
-    @word_length = word_length
-    @corpus = file || "/usr/share/dict/words"
+
+  DEFAULT_CORPUS = "wiktionary"
+
+  def self.default_corpus
+    CorrectHorseBatteryStaple::Corpus.read_csv File.join(self.corpus_directory, "wiktionary.csv")
   end
 
-  def make(count=4)
-    words.
-      values_at(
-        *count.times.map {  SecureRandom.random_number(words.length) }
-      ).
-      map { |word| word.chomp.downcase }.
-      join("-")
+  def self.generate(length = 4)
+    CorrectHorseBatteryStaple::Generator.new(self.default_corpus).make(length)
   end
 
-  def words
-    @words ||= File.readlines(@corpus).
-      # exclude newline from length
-      select {|word| @word_length.include?(word.length-1) }
+  protected
+
+  def self.corpus_directory
+    File.join(File.dirname(__FILE__), "../corpus")
   end
+
 end
 
+require 'correct_horse_battery_staple/generator'
+require 'correct_horse_battery_staple/corpus'
+require 'correct_horse_battery_staple/parser'
+
 if __FILE__ == $0
-  puts CorrectHorseBatteryStaple.new(3..6).
-    make((ARGV[0] || 4).to_i)
+  puts CorrectHorseBatteryStaple.generate((ARGV[0] || 4).to_i)
 end
