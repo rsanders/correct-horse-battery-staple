@@ -34,12 +34,16 @@ module CorrectHorseBatteryStaple
       round ? r.round : r
     end
 
-    def select_percentile(range)
+    def index_range_for_percentile(range)
       range = Range.new(range - 0.5, range + 0.5) if range.is_a?(Numeric)
       sort!
 
       slice(a = (percentile_index(range.begin, false).floor ..
           percentile_index(range.end,   false).ceil))
+    end
+
+    def select_percentile(range)
+      slice(index_range_for_percentile(range))
     end
 
   end
