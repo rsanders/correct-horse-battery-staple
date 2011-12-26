@@ -19,6 +19,7 @@ GEM
       hoe (>= 2.2.0)
     hoe-yard (0.1.2)
       yard (>= 0.2.3.1)
+    json (1.6.1)
     json_pure (1.6.3)
     method_source (0.6.6)
       ruby_parser (~> 2.0.5)
@@ -56,6 +57,7 @@ DEPENDENCIES
   hoe-gemspec
   hoe-git
   hoe-yard
+  json
   pry
   rspec
   rubyforge

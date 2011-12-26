@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'correct_horse_battery_staple'
+require 'correct_horse_battery_staple/assembler'
 require 'commander/import'
 
 program :version, "0.1.0"
@@ -25,7 +26,6 @@ command :generate do |c|
 
     corpus = CorrectHorseBatteryStaple.default_corpus
     puts "loaded corpus!" if options.debug
-    
     if options.verbose
       puts "Entropy: 2^#{count * corpus.entropy_per_word.floor} bits"
     end
@@ -37,5 +37,21 @@ command :generate do |c|
   end
 end
 
+command :mkcorpus do |c|
+  c.syntax = 'mkcorpus file [file, file, ...]'
+  c.summary = 'Generate a JSON corpus from an input file'
+  #c.description = ''
+  #c.example 'description', 'command example'
+  c.option '-i FORMAT', '--iformat FORMAT', 'Set the input format'
+  c.option '-o FORMAT', '--oformat FORMAT', 'Set the output format'
+  c.action do |args, options|
+    options.default :iformat => "wiktionary", :oformat => "json"
 
+    assembler = CorrectHorseBatteryStaple::Assembler.new(
+      CorrectHorseBatteryStaple::Parser::Regex.new(options.iformat.to_sym))
+    assembler.read(args)
+    assembler.process
+    assembler.save_as_json(STDOUT)
+  end
+end
 

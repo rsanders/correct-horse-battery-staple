@@ -5,6 +5,19 @@ class CorrectHorseBatteryStaple::Parser
     def <=>(other)
       self.frequency <=> other.frequency
     end
+
+    def to_json(*args)
+      to_hash.to_json(*args)
+    end
+
+    def to_csv(*args)
+      to_hash.to_csv(*args)
+    end
+
+    def to_hash
+      {:word => word, :frequency => frequency,
+       :rank => rank, :dispersion => dispersion}
+    end
   end
 
 end

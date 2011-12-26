@@ -2,6 +2,7 @@ source :rubygems
 
 gem "fastercsv"
 gem "commander"
+gem "json"
 
 group :test do
   gem "rspec"
