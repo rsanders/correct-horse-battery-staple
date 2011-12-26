@@ -1,7 +1,7 @@
 source :rubygems
 
 # data formats
-gem "fastercsv", :platform => :mri_18
+gem "fastercsv", :platforms => [:mri_18, :jruby]
 gem "json"
 
 # cmdline
