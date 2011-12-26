@@ -38,8 +38,8 @@ module CorrectHorseBatteryStaple
       range = Range.new(range - 0.5, range + 0.5) if range.is_a?(Numeric)
       sort!
 
-      slice(a = (percentile_index(range.begin, false).floor ..
-          percentile_index(range.end,   false).ceil))
+      (percentile_index(range.begin, false).floor ..
+          percentile_index(range.end,   false).ceil)
     end
 
     def select_percentile(range)
