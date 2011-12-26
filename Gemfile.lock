@@ -34,6 +34,8 @@ GEM
       ruby_parser (~> 2.0.5)
       slop (~> 2.1.0)
     rake (0.9.2)
+    rdoc (3.12)
+      json (~> 1.4)
     rspec (2.5.0)
       rspec-core (~> 2.5.0)
       rspec-expectations (~> 2.5.0)
@@ -74,6 +76,7 @@ DEPENDENCIES
   hoe-yard
   json
   pry
+  rdoc
   rspec
   rubyforge
   tddium

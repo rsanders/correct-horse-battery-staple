@@ -22,11 +22,6 @@ describe CorrectHorseBatteryStaple::Corpus do
     it "should have a word column" do
       subject[0][:word].should_not be_empty
     end
-
-    it "should contain an instance of FasterCSV" do
-      subject.instance_variable_defined?("@table").should be_true
-      subject.instance_variable_get("@table").class.name.should == "FasterCSV::Table"
-    end
   end
 
   context 'filtering' do

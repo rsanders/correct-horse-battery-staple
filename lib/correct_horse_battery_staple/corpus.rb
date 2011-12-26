@@ -1,9 +1,15 @@
-require 'faster_csv'
+if RUBY_VERSION.start_with? "1.8"
+  require 'faster_csv'
+  CSVLIB = FasterCSV
+else
+  require 'csv'
+  CSVLIB = CSV
+end
 
 class CorrectHorseBatteryStaple::Corpus
 
   def self.read_csv(file)
-    table = self.new FasterCSV.table(file)
+    table = self.new CSVLIB.table(file)
   end
 
   def initialize(table)

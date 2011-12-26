@@ -1,11 +1,13 @@
 source :rubygems
 
 # data formats
-gem "fastercsv"
+gem "fastercsv", :platform => :mri_18
 gem "json"
 
 # cmdline
 gem "commander"
+
+gem "rdoc"
 
 group :test do
   gem "rspec"
