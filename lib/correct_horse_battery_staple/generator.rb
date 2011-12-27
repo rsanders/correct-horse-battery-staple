@@ -20,15 +20,16 @@ class CorrectHorseBatteryStaple::Generator
       values_at(
         *count.times.map {  SecureRandom.random_number(words.length) }
       ).
-      map { |word| word.downcase }.
+      map { |word|  word.word.downcase  }.
       join("-")
   end
 
   def words
+    return @corpus
     @words ||= @corpus.
       filter {|entry|  @word_length.include?(entry[:word].to_s.length)
     }.
-    result.map {|e| e[:word]}
+    result
   end
 end
 

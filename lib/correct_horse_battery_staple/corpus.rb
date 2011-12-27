@@ -9,11 +9,17 @@ end
 class CorrectHorseBatteryStaple::Corpus
 
   def self.read_csv(file)
-    table = self.new CSVLIB.table(file)
+    raise NotImplementedException
+    # table = self.new CSVLIB.table(file)
   end
 
-  def initialize(table)
-    @table   = table
+  def self.read_json(file)
+    self.new(*JSON.parse(open(file).read).values_at("corpus", "stats"))
+  end
+
+  def initialize(table, stats = nil)
+    @table   = table.map {|hash| CorrectHorseBatteryStaple::Word.new(hash) }
+    @stats   = stats
     @filters = []
   end
 
@@ -25,13 +31,13 @@ class CorrectHorseBatteryStaple::Corpus
   def entropy_per_word
     Math.log(length) / Math.log(2)
   end
-  
+
   def reset
     @filters = []
   end
 
   def words
-    execute_filters.map {|row| row[:word]}
+    execute_filters.map {|entry| entry.word }
   end
 
   def result
@@ -39,12 +45,15 @@ class CorrectHorseBatteryStaple::Corpus
   end
 
   def frequencies
-    StatisticalArray.new(execute_filters.map {|row| row[:frequency]})
+    StatisticalArray.new(execute_filters.map {|entry| entry.frequency })
   end
 
+  # create a single composed function of all the filters
   def composed_filters(filters)
     return nil if !filters || filters.empty?
-    filters.reduce {|prev, current| lambda {|value| prev.call(value) && current.call(value) } }
+    filters.reduce do |prev, current|
+      lambda {|value| prev.call(value) && current.call(value) }
+    end
   end
 
   protected

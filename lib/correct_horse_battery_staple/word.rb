@@ -1,12 +1,12 @@
 class CorrectHorseBatteryStaple::Word 
-  attr_accessor :word, :frequency, :rank, :dispersion
+  attr_accessor :word, :frequency, :rank, :dispersion, :index
   attr_accessor :percentile, :distance
   attr_accessor :probability, :distance_probability
 
   include Comparable
 
   def initialize(value_map = {})
-    raise ArgumentError, "Must supply at least :word" unless value_map[:word]
+    raise ArgumentError, "Must supply at least :word" unless value_map[:word] || value_map["word"]
 
     update_from_hash(value_map)
   end
@@ -23,6 +23,14 @@ class CorrectHorseBatteryStaple::Word
     self.new.update_from_hash(JSON.read(json))
   end
 
+  def to_s
+    self.word
+  end
+
+  def inspect
+    "CRBS::Word(#{to_hash.inspect})"
+  end
+  
   def to_hash
     {}.tap do |hash|
       instance_variables.each do |key, val|
@@ -33,6 +41,7 @@ class CorrectHorseBatteryStaple::Word
 
   def update_from_hash(hash)
     hash.each do |key, val|
+      next if key.to_s == "wstruct"
       send "#{key}=", val
     end
     self

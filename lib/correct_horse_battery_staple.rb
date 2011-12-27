@@ -9,7 +9,7 @@ module CorrectHorseBatteryStaple
   end
 
   def self.load_corpus(corpus_name)
-    CorrectHorseBatteryStaple::Corpus.read_csv File.join(self.corpus_directory, "#{corpus_name}.csv")
+    CorrectHorseBatteryStaple::Corpus.read_json File.join(self.corpus_directory, "#{corpus_name}.json")
   end
 
   def self.generate(length = 4)
