@@ -10,7 +10,7 @@ module CorrectHorseBatteryStaple
 
   def self.load_corpus(corpus_name, format = "json")
     filename = corpus_name.match(/[.?]/) ? corpus_name :
-      File.join(self.corpus_directory, "#{corpus_name}.json")
+      File.join(self.corpus_directory, "#{corpus_name}.#{format}")
     CorrectHorseBatteryStaple::Corpus.read filename, format
   end
 

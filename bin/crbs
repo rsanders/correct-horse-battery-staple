@@ -15,17 +15,18 @@ command :generate do |c|
   c.summary = 'Generate a passphrase with a given number of words'
   #c.description = ''
   #c.example 'description', 'command example'
+  c.option '-f FORMAT', '--format FORMAT', 'Set the corpus format'
   c.option '-c CORPUSFILE', '--corpus CORPUSFILE', "File to use as the source corpus"
   c.option '--wordsize MIN..MAX', 'Set the allowed word size in # of characters'
   c.option '-n COUNT', '--repeat COUNT', Integer, 'How many passwords to generate'
   c.action do |args, options|
-    options.default :wordsize => "3..6", :repeat => 1, :corpus => "wiktionary"
+    options.default :wordsize => "3..6", :repeat => 1, :corpus => "wiktionary", :format => "json"
 
     number_of_words = (args[0] || 4).to_i
     wordsize = Range.new *options.wordsize.split('..').map {|x| x.to_i}
     count = options.repeat.to_i
 
-    corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus)
+    corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
     puts "loaded corpus!" if options.debug
     if options.verbose
       puts "Entropy: 2^#{count * corpus.entropy_per_word.floor} bits"

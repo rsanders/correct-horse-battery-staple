@@ -18,6 +18,10 @@ class CorrectHorseBatteryStaple::Corpus
              json["stats"])
   end
 
+  def self.read_marshal(file)
+    Marshal.load(open(file).read)
+  end
+
   def self.read(filename, format="json")
     send "read_#{format}", filename
   end

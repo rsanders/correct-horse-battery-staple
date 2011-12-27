@@ -85,7 +85,7 @@ class CorrectHorseBatteryStaple::Assembler
   end
 
   def make_corpus
-    raise NotImplementedError
+    CorrectHorseBatteryStaple::Corpus.new self.words, self.stats
   end
 
   def assemble
