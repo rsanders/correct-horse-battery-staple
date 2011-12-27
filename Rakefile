@@ -17,6 +17,7 @@ Hoe.spec 'correct-horse-battery-staple' do
   developer('Robert Sanders', 'robert@curioussquid.com')
   dependency 'commander', '>= 4.0'
   dependency 'fastercsv', '>= 1.5.3'
+  dependency 'json', '>= 1.6.0'
 end
 
 # vim: syntax=ruby

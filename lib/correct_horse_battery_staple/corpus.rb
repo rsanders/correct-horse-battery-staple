@@ -9,7 +9,7 @@ end
 class CorrectHorseBatteryStaple::Corpus
 
   def self.read_csv(file)
-    self.new CSVLIB.table(file).map {|hash| CorrectHorseBatteryStaple::Word.new(hash) }
+    self.new CSVLIB.table(file).map {|row| CorrectHorseBatteryStaple::Word.new(row.to_hash) }
   end
 
   def self.read_json(file)
@@ -22,8 +22,12 @@ class CorrectHorseBatteryStaple::Corpus
     Marshal.load(open(file).read)
   end
 
-  def self.read(filename, format="json")
-    send "read_#{format}", filename
+  def self.read(filename, fformat=nil)
+    if ! fformat
+      fformat = File.extname(filename)[1..-1]
+    end
+    raise ArgumentError, "Cannot determine file format for #{filename}" if !fformat || fformat.empty?
+    send "read_#{fformat}", filename
   end
 
   def initialize(table, stats = nil)

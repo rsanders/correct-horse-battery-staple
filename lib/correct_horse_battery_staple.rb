@@ -8,10 +8,29 @@ module CorrectHorseBatteryStaple
     self.load_corpus DEFAULT_CORPUS_NAME
   end
 
-  def self.load_corpus(corpus_name, format = "json")
+  def self.corpus_search_directories
+    [self.corpus_directory]
+  end
+
+  def self.find_corpus(corpus_name, formats = [:marshal, :json])
+    formats.each do |fmt|
+      fname = "#{corpus_name}.#{fmt}"
+      self.corpus_search_directories.each do |dir|
+        path = File.join(dir, fname)
+        return path if File.exist?(path)
+      end
+    end
+    nil
+  end
+
+  def self.load_corpus(corpus_name, formats = "json")
+    formats = Array(formats)
     filename = corpus_name.match(/[.?]/) ? corpus_name :
-      File.join(self.corpus_directory, "#{corpus_name}.#{format}")
-    CorrectHorseBatteryStaple::Corpus.read filename, format
+      self.find_corpus(corpus_name, formats)
+    unless filename && File.exist?(filename)
+      raise ArgumentError, "Cannot find corpus #{corpus_name}"
+    end
+    CorrectHorseBatteryStaple::Corpus.read filename
   end
 
   def self.generate(length = 4)
