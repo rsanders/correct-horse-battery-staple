@@ -39,7 +39,7 @@ end
 
 command :mkcorpus do |c|
   c.syntax = 'mkcorpus file [file, file, ...]'
-  c.summary = 'Generate a JSON corpus from an input file'
+  c.summary = 'Generate a JSON or CSV corpus from an input file'
   #c.description = ''
   #c.example 'description', 'command example'
   c.option '-i FORMAT', '--iformat FORMAT', 'Set the input format'
@@ -51,7 +51,12 @@ command :mkcorpus do |c|
       CorrectHorseBatteryStaple::Parser::Regex.new(options.iformat.to_sym))
     assembler.read(args)
     assembler.process
-    assembler.save_as_json(STDOUT)
+    case options.oformat.to_sym
+      when :json    then assembler.save_as_json(STDOUT)
+      when :csv     then assembler.save_as_csv(STDOUT)
+      when :marshal then assembler.save_as_marshal(STDOUT)      
+      else raise ArgumentError, "Supported output formats are 'json' and 'csv'"
+    end
   end
 end
 
