@@ -19,13 +19,6 @@ describe CorrectHorseBatteryStaple do
         CorrectHorseBatteryStaple::Corpus.should_receive(:read_json).and_return(27)
       end
 
-      it "should make the right subcalls" do
-        defcorp
-      end
-
-      it "should return the right answer" do
-        defcorp.should == 27
-      end
     end
   end
 
