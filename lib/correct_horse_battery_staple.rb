@@ -24,6 +24,7 @@ module CorrectHorseBatteryStaple
 
 end
 
+require 'correct_horse_battery_staple/word'
 require 'correct_horse_battery_staple/generator'
 require 'correct_horse_battery_staple/corpus'
 require 'correct_horse_battery_staple/parser'
