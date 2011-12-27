@@ -3,12 +3,12 @@ class CorrectHorseBatteryStaple::Parser
   class Regex < Base
     PARSERS  = {
         :wiktionary   =>  [%r{<a href="/wiki/\w+" title="(\w+)">\w+</a> = (\d+)},
-          lambda {|match, wstruct| wstruct.word = match[0]; wstruct.frequency = match[1].to_i }],
+          lambda {|match| CorrectHorseBatteryStaple::Word.new(:word => match[0], :frequency => match[1].to_i) }],
 
         # rank	lemma	PoS	freq	dispersion
         # 7	to	t	6332195	0.98
         :wordfrequency => [ %r{^(\d+)\t(\w+)\t\w\t(\d+)\t([0-9.])$},
-          lambda {|match, wstruct| wstruct.word = match[1]; wstruct.frequency = match[3] }]
+          lambda {|match| CorrectHorseBatteryStaple::Word.new(:word => match[1], :frequency => match[3]) }]
     }
 
     def initialize(type = :wiktionary)
@@ -21,7 +21,7 @@ class CorrectHorseBatteryStaple::Parser
 
       words = 
         file.read.scan(regex).map do |pair|
-           WStruct.new.tap {|w| lexer.call(pair, w) }
+          lexer.call(pair)
         end
 
     end

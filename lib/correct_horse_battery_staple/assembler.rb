@@ -16,12 +16,13 @@ class CorrectHorseBatteryStaple::Assembler
   end
 
   def read(urls)
-    self.words = 
+    self.words =
       urls.map do |url|
         @parser.parse open(url)
       end.reduce(:+).
           select {|wstruct| VALID_INITIAL_CHARS.include?(wstruct.word[0]) }.
-          sort
+      sort
+    self
   end
 
   def process
@@ -36,6 +37,7 @@ class CorrectHorseBatteryStaple::Assembler
         (freq/weighted_corpus_size) * 100
       end).mean_and_standard_deviation
     (self.freq_mean, self.freq_stddev)    = frequencies.mean_and_standard_deviation
+    self
   end
 
   def stats
@@ -47,7 +49,7 @@ class CorrectHorseBatteryStaple::Assembler
 
   def save_as_csv(io)
     io.puts "index,rank,word,frequency,percentile,distance,probability,distance_probability"
-    assemble do |w|
+    assemble do |w, index|
       io.puts sprintf("%d,%d,\"%s\",%d,%.4f,%.6f,%.8f,%.8f\n",
         w.index, w.rank, w.word, w.frequency,
         w.percentile, w.distance, w.probability, w.distance_probability)
@@ -59,31 +61,42 @@ class CorrectHorseBatteryStaple::Assembler
     io.print stats.to_json
     io.print ', "corpus": ['
     i = 0
-    assemble do |entry|
+    assemble do |word, index|
       io.puts "," if i >= 1
-      io.print(entry.to_json)
+      io.print(word.to_hash.to_json)
       i += 1
     end
     puts "]"
     io.puts "}"
   end
 
+  def save_as_marshal(io)
+    io.write Marshal.dump(make_corpus)
+  end
+
+  def randomize
+    self.words.shuffle!
+    self
+  end
+
+  def limit(count)
+    self.words.slice!(count..-1) if self.words.length > count
+    self
+  end
+
+  def make_corpus
+    raise NotImplementedError
+  end
+
   def assemble
-    words.each_with_index do |wstruct, index|
-      word            = wstruct.word
-      freq            = wstruct.frequency
-      distance        = (freq-freq_mean)/freq_stddev
-      probability     = freq/weighted_corpus_size
-      distance_prob   = (probability - prob_mean) / prob_stddev
-      percentile      = (index-0.5)/corpus_size * 100
-      yield :index => index,
-        :wstruct => wstruct,
-        :word => word,
-        :rank => wstruct.rank, :frequency => freq,
-        :percentile => percentile, :distance => distance,
-        :probability => (probability * 100).to_f,
-        :distance_probability => distance_prob.to_f
+    words.each_with_index do |entry, index|
+      entry.distance                  = (entry.frequency-freq_mean)/freq_stddev
+      entry.probability               = entry.frequency / weighted_corpus_size
+      entry.distance_probability      = (entry.probability - prob_mean) / prob_stddev
+      entry.percentile                = (index-0.5)/corpus_size * 100
+      yield entry, index
     end
+    self
   end
 
   protected

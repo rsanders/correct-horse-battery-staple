@@ -8,7 +8,11 @@ class CorrectHorseBatteryStaple::Word
   def initialize(value_map = {})
     raise ArgumentError, "Must supply at least :word" unless value_map[:word] || value_map["word"]
 
-    update_from_hash(value_map)
+    case value_map
+      when Hash then     update_from_hash(value_map)
+      when CorrectHorseBatteryStaple::Word then update_from_hash(value_map.to_hash)
+      else raise "What? #{value_map}"
+    end
   end
 
   def <=>(other)
@@ -19,30 +23,24 @@ class CorrectHorseBatteryStaple::Word
     to_hash.to_json(*args)
   end
 
-  def self.from_json(json)
-    self.new.update_from_hash(JSON.read(json))
-  end
-
   def to_s
     self.word
   end
 
   def inspect
-    "CRBS::Word(#{to_hash.inspect})"
+    "CRBS::Word(#{self.to_hash.inspect})"
   end
-  
+
   def to_hash
-    {}.tap do |hash|
-      instance_variables.each do |key, val|
-        hash[key.to_s[1..-1]] = val
-      end
+    instance_variables.reduce({}) do |hash, key|
+      hash[key.to_s[1..-1]] = instance_variable_get(key)
+      hash
     end
   end
 
   def update_from_hash(hash)
     hash.each do |key, val|
-      next if key.to_s == "wstruct"
-      send "#{key}=", val
+      self[key] = val unless key.to_s == "wstruct"
     end
     self
   end

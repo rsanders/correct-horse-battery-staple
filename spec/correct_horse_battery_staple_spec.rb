@@ -16,7 +16,7 @@ describe CorrectHorseBatteryStaple do
 
       before do
         CorrectHorseBatteryStaple.should_receive(:corpus_directory).and_return(FIXTURES_DIR)
-        CorrectHorseBatteryStaple::Corpus.should_receive(:read_csv).and_return(27)
+        CorrectHorseBatteryStaple::Corpus.should_receive(:read_json).and_return(27)
       end
 
       it "should make the right subcalls" do

@@ -32,7 +32,7 @@ words = urls.map do |url|
   parser_class.new.parse open(url)
 end.reduce(:+).select {|wstruct| wstruct.word =~ /^[a-zA-Z]/ }.sort
 
-# total number of words
+# Total number of words
 count       = words.length
 
 # assign ranks

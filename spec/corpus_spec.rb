@@ -4,12 +4,12 @@ describe CorrectHorseBatteryStaple::Corpus do
 
   subject { corpus }
 
-  let :csv_file do
-    File.join(FIXTURES_DIR, "corpus1.csv")
+  let :json_file do
+    File.join(FIXTURES_DIR, "100.json")
   end
 
   let :corpus do
-    CorrectHorseBatteryStaple::Corpus.read_csv csv_file
+    CorrectHorseBatteryStaple::Corpus.read_json json_file
   end
 
   context 'loading CSV' do

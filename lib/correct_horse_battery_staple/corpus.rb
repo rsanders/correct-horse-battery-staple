@@ -9,16 +9,21 @@ end
 class CorrectHorseBatteryStaple::Corpus
 
   def self.read_csv(file)
-    raise NotImplementedException
-    # table = self.new CSVLIB.table(file)
+    self.new CSVLIB.table(file).map {|hash| CorrectHorseBatteryStaple::Word.new(hash) }
   end
 
   def self.read_json(file)
-    self.new(*JSON.parse(open(file).read).values_at("corpus", "stats"))
+    json = JSON.parse(open(file).read)
+    self.new(json["corpus"].map {|hash| CorrectHorseBatteryStaple::Word.new(hash)},
+             json["stats"])
+  end
+
+  def self.read(filename, format="json")
+    send "read_#{format}", filename
   end
 
   def initialize(table, stats = nil)
-    @table   = table.map {|hash| CorrectHorseBatteryStaple::Word.new(hash) }
+    @table   = table
     @stats   = stats
     @filters = []
   end

@@ -15,16 +15,17 @@ command :generate do |c|
   c.summary = 'Generate a passphrase with a given number of words'
   #c.description = ''
   #c.example 'description', 'command example'
+  c.option '-c CORPUSFILE', '--corpus CORPUSFILE', "File to use as the source corpus"
   c.option '--wordsize MIN..MAX', 'Set the allowed word size in # of characters'
-  c.option '-n COUNT', '--repeat COUNT', 'How many passwords to generate'
+  c.option '-n COUNT', '--repeat COUNT', Integer, 'How many passwords to generate'
   c.action do |args, options|
-    options.default :wordsize => "3..6", :repeat => 1
+    options.default :wordsize => "3..6", :repeat => 1, :corpus => "wiktionary"
 
     number_of_words = (args[0] || 4).to_i
     wordsize = Range.new *options.wordsize.split('..').map {|x| x.to_i}
     count = options.repeat.to_i
 
-    corpus = CorrectHorseBatteryStaple.default_corpus
+    corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus)
     puts "loaded corpus!" if options.debug
     if options.verbose
       puts "Entropy: 2^#{count * corpus.entropy_per_word.floor} bits"
@@ -44,12 +45,18 @@ command :mkcorpus do |c|
   #c.example 'description', 'command example'
   c.option '-i FORMAT', '--iformat FORMAT', 'Set the input format'
   c.option '-o FORMAT', '--oformat FORMAT', 'Set the output format'
+  c.option '-R', '--randomize', 'Randomize word order'
+  c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
   c.action do |args, options|
-    options.default :iformat => "wiktionary", :oformat => "json"
+    options.default :iformat => "wiktionary", :oformat => "json", :limit => -1
 
     assembler = CorrectHorseBatteryStaple::Assembler.new(
       CorrectHorseBatteryStaple::Parser::Regex.new(options.iformat.to_sym))
     assembler.read(args)
+    assembler.randomize if options.randomize
+    if options.limit > -1
+      assembler.limit(options.limit)
+    end
     assembler.process
     case options.oformat.to_sym
       when :json    then assembler.save_as_json(STDOUT)
