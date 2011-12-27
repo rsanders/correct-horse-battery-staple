@@ -34,7 +34,7 @@ module CorrectHorseBatteryStaple
   end
 
   def self.generate(length = 4)
-    CorrectHorseBatteryStaple::Generator.new(self.load_corpus(DEFAULT_CORPUS_NAME)).make(length)
+    CorrectHorseBatteryStaple::Generator.new(self.default_corpus).make(length)
   end
 
   protected
