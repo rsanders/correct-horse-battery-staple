@@ -7,8 +7,12 @@ class CorrectHorseBatteryStaple::Parser
 
         # rank	lemma	PoS	freq	dispersion
         # 7	to	t	6332195	0.98
-        :wordfrequency => [ %r{^(\d+)\t(\w+)\t\w\t(\d+)\t([0-9.])$},
-          lambda {|match| CorrectHorseBatteryStaple::Word.new(:word => match[1], :frequency => match[3]) }]
+        :wordfrequency => [ %r{^(\d+)\s+(\w+)\s+\w*\s+(\d+)\s+([0-9.]+)$},
+        lambda {|match| CorrectHorseBatteryStaple::Word.new(:word => match[1],
+            :rank => match[0].to_f,
+            :frequency => match[3].to_f,
+            :dispersion => match[4].to_f)
+        }]
     }
 
     def initialize(type = :wiktionary)
@@ -20,8 +24,8 @@ class CorrectHorseBatteryStaple::Parser
       (regex, lexer) = PARSERS[@parser_type]
 
       words = 
-        file.read.scan(regex).map do |pair|
-          lexer.call(pair)
+        file.read.scan(regex).map do |match|
+          lexer.call(match)
         end
 
     end
