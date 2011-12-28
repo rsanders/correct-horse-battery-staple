@@ -109,8 +109,6 @@ command :generate do |c|
 
     corpus = corpus.result
 
-    logger.debug "Corpus: #{corpus.inspect}"
-
     entropy = number_of_words * corpus.entropy_per_word.floor
     if options.verbose
       guesses_per_sec = 1000.0

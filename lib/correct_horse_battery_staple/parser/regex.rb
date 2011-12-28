@@ -7,11 +7,22 @@ class CorrectHorseBatteryStaple::Parser
 
         # rank	lemma	PoS	freq	dispersion
         # 7	to	t	6332195	0.98
-        :wordfrequency => [ %r{^(\d+)\s+(\w+)\s+\w*\s+(\d+)\s+([0-9.]+)$},
+        :wordfrequency => [ %r{^(\d+)\s+(\w+)\s+\w*\s+(\d+)\s+([0-9.]+)},
         lambda {|match| CorrectHorseBatteryStaple::Word.new(:word => match[1],
             :rank => match[0].to_f,
             :frequency => match[3].to_f,
             :dispersion => match[4].to_f)
+        }],
+
+        # using tabs between columns
+        # freq    word    PoS     # texts
+        # -----   -----   -----   -----
+        # 22995878        the     at      169011
+        # 11239776        and     cc      168844
+        :coca => [ %r{^(\d+)\s+(\w+)\s+\w*\s+(\d+)},
+        lambda {|match| CorrectHorseBatteryStaple::Word.new(:word => match[1],
+            :frequency => match[0].to_i,
+            :texts => match[2].to_i)
         }],
 
       # <tr>
