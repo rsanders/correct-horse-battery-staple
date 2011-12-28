@@ -53,6 +53,20 @@ describe CorrectHorseBatteryStaple do
         CorrectHorseBatteryStaple.generate(4).split(/-/).should have(4).items
       end
     end
+
+    context '.load_corpus' do
+      context 'given a file path' do
+        it 'should load a file by path'
+        it 'should detect the format from extension'
+      end
+
+      context 'in a standard search directory' do
+        it 'should load a corpus by name'
+        it 'should load a corpus by name w/extension'
+        it 'should detect the format from extension'
+      end
+    end
+
   end
 
 end
