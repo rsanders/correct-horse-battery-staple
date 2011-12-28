@@ -6,6 +6,9 @@ gem "json"
 
 # cmdline
 gem "commander"
+platform :jruby do
+  gem "ffi-ncurses"
+end
 
 gem "rdoc"
 
