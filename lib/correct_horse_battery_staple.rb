@@ -1,8 +1,14 @@
+require 'logger'
 
 module CorrectHorseBatteryStaple
   VERSION = '0.1.0'
 
   DEFAULT_CORPUS_NAME = "wiktionary"
+
+  class << self
+    attr_accessor :logger
+  end
+  self.logger = Logger.new(STDERR)
 
   def self.default_corpus
     self.load_corpus DEFAULT_CORPUS_NAME
@@ -43,6 +49,11 @@ module CorrectHorseBatteryStaple
     File.join(File.dirname(__FILE__), "../corpus")
   end
 
+  module Common
+    def logger
+      CorrectHorseBatteryStaple.logger
+    end
+  end
 end
 
 require 'correct_horse_battery_staple/word'

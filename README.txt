@@ -23,6 +23,11 @@ By default we use the Project Gutenberg 2005 corpus taken from Wiktionary.
 
 See http://xkcd.com/936/ for the genesis of the idea.
 
+Data sources:
+
+     http://en.wiktionary.org/wiki/Wiktionary:Frequency_lists
+     http://wordfrequency.info/
+
 == FEATURES/PROBLEMS:
 
 * FIX (list of features or problems)

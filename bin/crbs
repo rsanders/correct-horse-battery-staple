@@ -3,12 +3,42 @@
 require 'correct_horse_battery_staple'
 require 'correct_horse_battery_staple/assembler'
 require 'commander/import'
+require 'logger'
 
 program :version, "0.1.0"
 program :description, "Correct Horse Battery Staple - XKCD-style Passphrases"
 
 global_option '-D', '--debug', 'Display full protocol trace'
 global_option '-V', '--verbose', 'Shows request and response'
+
+logger = Logger.new(STDERR)
+
+command :repl do |c|
+  c.action do |args, options|
+    require 'pry'
+    binding.pry
+  end
+end
+
+command :convert do |c|
+  c.syntax = 'convert'
+  c.summary = 'Convert a corpus from one format to another'
+  c.option '-i IFORMAT', '--iformat IFORMAT', 'Set the output corpus format'
+  c.option '-o OFORMAT', '--oformat OFORMAT', 'Set the output corpus format'
+  c.option '-c CORPUSFILE', '--corpus CORPUSFILE', "File to use as the source corpus"
+
+  c.action do |args, options|
+    options.default :corpus => "wiktionary", :oformat => "marshal",
+                    :iformat => "json"
+
+    if options.iformat == options.oformat and !options.debug
+      raise ArgumentError, "Input and output format should differ"
+    end
+
+    corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.iformat)
+    corpus.write(STDERR, options.oformat)
+  end
+end
 
 command :generate do |c|
   c.syntax = 'generate [<number of words>]'
@@ -27,7 +57,7 @@ command :generate do |c|
 
   c.action do |args, options|
     options.default :wordsize => "3..7", :repeat => 1, :corpus => "wiktionary",
-                    :format => "json", :percentile => "30..80"
+                    :format => "marshal", :percentile => "30..80"
 
     number_of_words = (args[0] || 4).to_i
     count = options.repeat.to_i
@@ -48,6 +78,9 @@ command :generate do |c|
     end
 
     corpus = corpus.result
+
+    logger.debug "Corpus: #{corpus.inspect}"
+
     entropy = number_of_words * corpus.entropy_per_word.floor
     if options.verbose
       guesses_per_sec = 1000.0
@@ -89,8 +122,8 @@ command :mkcorpus do |c|
     case options.oformat.to_sym
       when :json    then assembler.save_as_json(STDOUT)
       when :csv     then assembler.save_as_csv(STDOUT)
-      when :marshal then assembler.save_as_marshal(STDOUT)      
-      else raise ArgumentError, "Supported output formats are 'json' and 'csv'"
+      when :marshal then assembler.save_as_marshal(STDOUT)
+      else raise ArgumentError, "Supported output formats are 'marshal', 'json', and 'csv'"
     end
   end
 end

@@ -6,9 +6,20 @@ module CorrectHorseBatteryStaple
       @sorted = sorted
     end
 
+    def self.cast(array)
+      array.is_a?(CorrectHorseBatteryStaple::StatisticalArray) ? array :
+        CorrectHorseBatteryStaple::StatisticalArray.new(array)
+    end
+
     def sort!
       @obj    = @obj.sort unless @sorted
       @sorted = true
+      self
+    end
+
+    def sort_by!(&block)
+      @obj     = @obj.sort_by(&block)
+      @sorted  = true
       self
     end
 

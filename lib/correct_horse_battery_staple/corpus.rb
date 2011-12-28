@@ -1,12 +1,22 @@
-if RUBY_VERSION.start_with? "1.8"
-  require 'faster_csv'
-  CSVLIB = FasterCSV
-else
-  require 'csv'
-  CSVLIB = CSV
-end
+require 'bigdecimal'
 
 class CorrectHorseBatteryStaple::Corpus
+  include CorrectHorseBatteryStaple::Common
+
+  attr_reader   :table
+
+  attr_accessor :frequency_mean, :frequency_stddev
+  attr_accessor :probability_mean, :probability_stddev
+  attr_accessor :original_corpus_size
+  attr_accessor :weighted_size
+
+  if RUBY_VERSION.start_with? "1.8"
+    require 'faster_csv'
+    CSVLIB = FasterCSV
+  else
+    require 'csv'
+    CSVLIB = CSV
+  end
 
   def self.read_csv(file)
     self.new CSVLIB.table(file).map {|row| CorrectHorseBatteryStaple::Word.new(row.to_hash) }
@@ -31,9 +41,12 @@ class CorrectHorseBatteryStaple::Corpus
   end
 
   def initialize(table, stats = nil)
-    @table   = table
+    @table   = CorrectHorseBatteryStaple::StatisticalArray.cast(table)
     @stats   = stats
     @filters = []
+
+    self.original_corpus_size = @table.length
+    recalculate
   end
 
   def filter(&block)
@@ -53,12 +66,19 @@ class CorrectHorseBatteryStaple::Corpus
     execute_filters.map {|entry| entry.word }
   end
 
+  def each_entry(&block)
+    @table.each &block
+  end
+
   def result
-    self.class.new execute_filters
+    self.class.new(execute_filters).tap do |new_corpus|
+      new_corpus.original_corpus_size = self.original_corpus_size
+      new_corpus.recalculate
+    end
   end
 
   def frequencies
-    StatisticalArray.new(execute_filters.map {|entry| entry.frequency })
+    CorrectHorseBatteryStaple::StatisticalArray.new(execute_filters.map {|entry| entry.frequency })
   end
 
   # create a single composed function of all the filters
@@ -67,6 +87,69 @@ class CorrectHorseBatteryStaple::Corpus
     filters.reduce do |prev, current|
       lambda {|value| prev.call(value) && current.call(value) }
     end
+  end
+
+  def recalculate
+    # assign ranks
+    size = self.size
+    @table.each_with_index {|word, i| word.rank = size-i }
+
+    self.weighted_size  = frequencies.reduce(BigDecimal.new("0"), :+)
+
+    (self.probability_mean, self.probability_stddev)    = CorrectHorseBatteryStaple::StatisticalArray.new(frequencies.map do |freq|
+        (freq/weighted_size) * 100
+      end).mean_and_standard_deviation
+    (self.frequency_mean, self.frequency_stddev)    = frequencies.mean_and_standard_deviation
+    self
+  end
+
+  def stats
+    {:frequency_mean => frequency_mean, :frequency_stddev => frequency_stddev,
+      :probability_mean => probability_mean, :probability_stddev => probability_stddev,
+      :size => size, :original_size => original_size,
+      :weighted_size => weighted_size.to_f}
+  end
+
+  def size
+    @table.length
+  end
+
+  # serialization
+
+  def write_csv(io)
+    io.puts "index,rank,word,frequency,percentile,distance,probability,distance_probability"
+    @table.each_with_index do |w, index|
+      io.puts sprintf("%d,%d,\"%s\",%d,%.4f,%.6f,%.8f,%.8f\n",
+        index, w.rank, w.word, w.frequency || 0,
+        w.percentile || 0, w.distance || 0, w.probability || 0, w.distance_probability || 0)
+    end
+  end
+
+  def write_json1(io)
+    io.write({"stats" => stats, "corpus" => @table }.to_json)
+  end
+
+  def write_json(io)
+    io.print '{"stats": '
+    io.print stats.to_json
+    io.print ', "corpus": ['
+    i = 0
+    @table.each do |word|
+      io.puts "," if i >= 1
+      io.print(word.to_hash.to_json)
+      i += 1
+    end
+    puts "]"
+    io.puts "}"
+  end
+
+  def write_marshal(io)
+    io.write Marshal.dump(self)
+  end
+
+  def write(io, fformat=nil)
+    raise ArgumentError, "Cannot determine file format for output" if !fformat || fformat.empty?
+    send "write_#{fformat}", io
   end
 
   protected

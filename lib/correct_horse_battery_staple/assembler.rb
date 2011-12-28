@@ -2,6 +2,7 @@ require 'bigdecimal'
 require 'json'
 
 class CorrectHorseBatteryStaple::Assembler
+  include CorrectHorseBatteryStaple::Common
 
   attr_accessor :freq_mean, :freq_stddev
   attr_accessor :prob_mean, :prob_stddev

@@ -6,7 +6,7 @@ require 'securerandom'
 # Generate an N-word passphrase from a corpus
 #
 class CorrectHorseBatteryStaple::Generator
-  VERSION = '0.1.0'
+  include CorrectHorseBatteryStaple::Common
 
   attr_accessor :word_length, :corpus
 
