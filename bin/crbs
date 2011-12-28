@@ -31,7 +31,7 @@ command :convert do |c|
   c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
 
   c.action do |args, options|
-    options.default :corpus => "wiktionary", :limit => -1
+    options.default :limit => -1
 
     infile = args[0]
     outfile = args[1] && args[1] != "-" ? open(args[1], "w") : STDOUT
@@ -86,7 +86,8 @@ command :generate do |c|
            'Set the percentile range of the word frequency'
 
   c.action do |args, options|
-    options.default :wordsize => "3..7", :repeat => 1, :corpus => "wiktionary",
+    options.default :wordsize => "3..7", :repeat => 1,
+                    :corpus => CorrectHorseBatteryStaple::DEFAULT_CORPUS_NAME,
                     :format => "marshal", :percentile => "30..80"
 
     number_of_words = (args[0] || 4).to_i
