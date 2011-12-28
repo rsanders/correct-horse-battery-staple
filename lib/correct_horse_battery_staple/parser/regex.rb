@@ -12,7 +12,21 @@ class CorrectHorseBatteryStaple::Parser
             :rank => match[0].to_f,
             :frequency => match[3].to_f,
             :dispersion => match[4].to_f)
-        }]
+        }],
+
+      # <tr>
+      # <td>25</td>
+      # <td><a href="/wiki/be" title="be">be</a></td>
+      # <td>191823</td>
+      # </tr>
+      :tvscripts => [
+        Regexp.new('<tr>.*?<td>(\d+)</td>.*?<td>.*?title="(\w+)".*?</td>.*?<td>(\d+)</td>.*?</tr>', Regexp::MULTILINE),
+        lambda {|match| CorrectHorseBatteryStaple::Word.new(
+            :rank => match[0].to_i,
+            :word => match[1],
+            :frequency => match[2].to_i
+            ) }
+      ]
     }
 
     def initialize(type = :wiktionary)
