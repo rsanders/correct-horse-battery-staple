@@ -5,7 +5,7 @@ class CorrectHorseBatteryStaple::Assembler
   include CorrectHorseBatteryStaple::Common
 
   attr_accessor :words
-  
+
   VALID_INITIAL_CHARS = ([*'A'..'Z'] + [*'a'..'z']).map {|ls| ls[0]}
 
   def initialize(parser = nil)
@@ -17,7 +17,8 @@ class CorrectHorseBatteryStaple::Assembler
       urls.map do |url|
         @parser.parse open(url)
       end.reduce(:+).
-          select {|wstruct| VALID_INITIAL_CHARS.include?(wstruct.word[0]) }
+          select {|wstruct| VALID_INITIAL_CHARS.include?(wstruct.word[0]) }.
+          sort
 
     self
   end
