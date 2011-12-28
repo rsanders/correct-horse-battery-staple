@@ -31,7 +31,7 @@ command :convert do |c|
   c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
 
   c.action do |args, options|
-    options.default :corpus => "wiktionary"
+    options.default :corpus => "wiktionary", :limit => -1
 
     infile = args[0]
     outfile = args[1] && args[1] != "-" ? open(args[1], "w") : STDOUT
