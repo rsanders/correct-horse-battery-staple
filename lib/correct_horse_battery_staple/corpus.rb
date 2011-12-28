@@ -164,6 +164,10 @@ class CorrectHorseBatteryStaple::Corpus
     send "write_#{fformat}", io
   end
 
+  def table
+    @table
+  end
+
   protected
 
   def execute_filters

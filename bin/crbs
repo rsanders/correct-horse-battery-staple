@@ -26,6 +26,9 @@ command :convert do |c|
   c.option '-i IFORMAT', '--iformat IFORMAT', 'Set the output corpus format'
   c.option '-o OFORMAT', '--oformat OFORMAT', 'Set the output corpus format'
   c.option '-r', '--recalculate', 'Recalculate all statistics before outputting'
+  c.option '-S FIELD', '--sortby FIELD', 'Sort words by field'
+  c.option '-R', '--randomize', 'Randomize word order'
+  c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
 
   c.action do |args, options|
     options.default :corpus => "wiktionary"
@@ -44,7 +47,26 @@ command :convert do |c|
 
     corpus = CorrectHorseBatteryStaple.load_corpus(args[0], options.iformat)
     corpus.recalculate if options.recalculate
+
+    corpus.table.shuffle! if options.randomize
+    if options.limit > -1
+      corpus.table.slice!(options.limit..-1) if corpus.size > options.limit
+    end
     corpus.write(outfile, options.oformat)
+  end
+end
+
+command :stats do |c|
+  c.syntax = 'stats <corpusfile>'
+  c.summary = 'Show statistics from a corpus'
+
+  c.action do |args,options|
+    corpus = CorrectHorseBatteryStaple.load_corpus(args[0])
+
+    stats = corpus.stats
+    stats.to_hash.each do |key, val|
+      puts "#{key}: #{val}"
+    end
   end
 end
 
