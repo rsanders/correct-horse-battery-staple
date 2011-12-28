@@ -7,7 +7,7 @@ class CorrectHorseBatteryStaple::Corpus
 
   attr_accessor :frequency_mean, :frequency_stddev
   attr_accessor :probability_mean, :probability_stddev
-  attr_accessor :original_corpus_size
+  attr_accessor :original_size
   attr_accessor :weighted_size
 
   if RUBY_VERSION.start_with? "1.8"
@@ -45,7 +45,7 @@ class CorrectHorseBatteryStaple::Corpus
     @stats   = stats
     @filters = []
 
-    self.original_corpus_size = @table.length
+    self.original_size = @table.length
     recalculate
   end
 
@@ -72,7 +72,7 @@ class CorrectHorseBatteryStaple::Corpus
 
   def result
     self.class.new(execute_filters).tap do |new_corpus|
-      new_corpus.original_corpus_size = self.original_corpus_size
+      new_corpus.original_size = self.original_size
       new_corpus.recalculate
     end
   end
@@ -89,17 +89,30 @@ class CorrectHorseBatteryStaple::Corpus
     end
   end
 
+  #
+  # Note that this mutates the Word objects so that stats for the
+  # source table after a filter.result sequence will no longer be
+  # valid. Also, any references to the original array will now be
+  # pointing to updated data.
+  #
   def recalculate
-    # assign ranks
     size = self.size
-    @table.each_with_index {|word, i| word.rank = size-i }
 
+    # corpus-wide statistics
     self.weighted_size  = frequencies.reduce(BigDecimal.new("0"), :+)
-
     (self.probability_mean, self.probability_stddev)    = CorrectHorseBatteryStaple::StatisticalArray.new(frequencies.map do |freq|
         (freq/weighted_size) * 100
       end).mean_and_standard_deviation
     (self.frequency_mean, self.frequency_stddev)    = frequencies.mean_and_standard_deviation
+
+    @table.each_with_index do |entry, index|
+      entry.rank                      = size - index
+      entry.distance                  = (entry.frequency-frequency_mean)/frequency_stddev
+      entry.probability               = entry.frequency / weighted_size
+      entry.distance_probability      = (entry.probability - probability_mean) / probability_stddev
+      entry.percentile                = (index-0.5)/size * 100
+    end
+
     self
   end
 
@@ -139,8 +152,7 @@ class CorrectHorseBatteryStaple::Corpus
       io.print(word.to_hash.to_json)
       i += 1
     end
-    puts "]"
-    io.puts "}"
+    io.puts "]\n}"
   end
 
   def write_marshal(io)
