@@ -50,6 +50,7 @@ require 'correct_horse_battery_staple/generator'
 require 'correct_horse_battery_staple/corpus'
 require 'correct_horse_battery_staple/parser'
 require 'correct_horse_battery_staple/statistical_array'
+require 'correct_horse_battery_staple/range_parser'
 
 if __FILE__ == $0
   puts CorrectHorseBatteryStaple.generate((ARGV[0] || 4).to_i)
