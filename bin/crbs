@@ -27,7 +27,7 @@ command :generate do |c|
 
   c.action do |args, options|
     options.default :wordsize => "3..7", :repeat => 1, :corpus => "wiktionary",
-                    :format => "json", :percentile => "20..90"
+                    :format => "json", :percentile => "30..80"
 
     number_of_words = (args[0] || 4).to_i
     count = options.repeat.to_i
@@ -35,7 +35,7 @@ command :generate do |c|
     corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
     puts "loaded corpus!" if options.debug
     unfiltered_size = corpus.length
-    
+
     f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize
 
     unless f_wordsize.begin <= 1 && f_wordsize.end >= 30
@@ -52,10 +52,10 @@ command :generate do |c|
     if options.verbose
       guesses_per_sec = 1000.0
       search_space = 2**entropy
-      years = (search_space / guesses_per_sec / (365*24*3600)).round
+      years = search_space / guesses_per_sec / (365*24*3600)
       puts "Corpus size: #{corpus.length} candidate words of #{unfiltered_size} total"
       puts "Entropy: #{entropy} bits (2^#{entropy} = #{search_space})"
-      puts "Years to guess at #{guesses_per_sec} guesses/sec: #{years}"
+      puts "Years to guess at #{guesses_per_sec.to_i} guesses/sec: #{years.round}"
     end
 
     generator = CorrectHorseBatteryStaple::Generator.new(corpus)
@@ -71,8 +71,8 @@ command :mkcorpus do |c|
   c.summary = 'Generate a JSON or CSV corpus from an input file'
   #c.description = ''
   #c.example 'description', 'command example'
-  c.option '-i FORMAT', '--iformat FORMAT', 'Set the input format'
-  c.option '-o FORMAT', '--oformat FORMAT', 'Set the output format'
+  c.option '-i FORMAT', '--iformat FORMAT', 'Set the input format - "wiktionary" or "wordfrequency"'
+  c.option '-o FORMAT', '--oformat FORMAT', 'Set the output format - "marshal", "json", or "csv"'
   c.option '-R', '--randomize', 'Randomize word order'
   c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
   c.action do |args, options|

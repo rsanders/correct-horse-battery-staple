@@ -4,7 +4,24 @@
 
 == DESCRIPTION:
 
-FIX (describe your package)
+Generate a 4 word password from words of size 3-8 characters, with
+frequencies in the 30th-60th percentile. This range gives a nice set
+of uncommon but not completely alien words.
+
+    crbs generate --verbose -W 3..8 -P 30..60
+    Corpus size: 6396 candidate words of 33075 total
+    Entropy: 48 bits (2^48 = 281474976710656)
+    Years to guess at 1000 guesses/sec: 8926
+    magnate-thermal-sandbank-augur
+
+With the --verbose flag, the utility will calculate a time-to-guess
+based on a completely arbitrary 1000 guesses/sec.  If you'd like a
+more secure password, either relax the various filtering rules (-W and
+-P), add more words to the password, or use a larger corpus.
+
+By default we use the Project Gutenberg 2005 corpus taken from Wiktionary.
+
+See http://xkcd.com/936/ for the genesis of the idea.
 
 == FEATURES/PROBLEMS:
 
