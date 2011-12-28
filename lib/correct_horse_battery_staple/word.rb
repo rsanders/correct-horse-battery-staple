@@ -1,7 +1,39 @@
-class CorrectHorseBatteryStaple::Word 
-  attr_accessor :word, :frequency, :rank, :dispersion, :index
-  attr_accessor :percentile, :distance
-  attr_accessor :probability, :distance_probability
+class CorrectHorseBatteryStaple::Word
+  # text of word
+  attr_accessor :word
+
+  # frequency is the total count of the word in corpus
+  attr_accessor :frequency
+
+  # rank is the word position when sorted by frequency in entire corpus
+  # index is the index of the word in this (sub)corpus
+  attr_accessor :rank, :index
+
+  # dispersion is Juilland dispersion, the % of texts containing the
+  # word. texts is the # of texts containing the word.
+  attr_accessor :dispersion
+
+  # texts is the # of texts containing the word. this is not available
+  # for many frequency lists.
+  attr_accessor :texts
+
+  ## statistical measure of word position in sorted frequency list
+
+  # in which percentile does the word appear. this can be calculated
+  # from the array of words so is somewhat redundant here
+  attr_accessor :percentile
+
+  # this word's frequency's distance from mean frequency in stddevs;
+  # signed.
+  attr_accessor :distance
+
+  # probability is the chance of any given word in a text composed
+  # of the sum of (word*frequency) in the corpus being this word.
+  attr_accessor :probability
+
+  # distance_probability is the distance of this word's probability
+  # from the mean in stddev
+  attr_accessor :distance_probability
 
   include Comparable
 
