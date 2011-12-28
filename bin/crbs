@@ -127,6 +127,20 @@ command :generate do |c|
   end
 end
 
+command :list do |c|
+  c.syntax = 'list'
+  c.summary = 'Show a list of available corpus names'
+
+  c.action do |args, options|
+    list = CorrectHorseBatteryStaple.corpus_list
+
+    list.each_with_index do |item, i|
+      list[i] = "[#{item}]" if item == CorrectHorseBatteryStaple::DEFAULT_CORPUS_NAME
+    end
+    puts list.sort.join(', ')
+  end
+end
+
 command :mkcorpus do |c|
   c.syntax = 'mkcorpus file [file, file, ...]'
   c.summary = 'Generate a JSON or CSV corpus from an input file'

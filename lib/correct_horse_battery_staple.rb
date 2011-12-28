@@ -5,6 +5,8 @@ module CorrectHorseBatteryStaple
 
   DEFAULT_CORPUS_NAME = "tvscripts"
 
+  SUPPORTED_FORMATS = %w[marshal json csv]
+  
   class << self
     attr_accessor :logger
   end
@@ -18,7 +20,14 @@ module CorrectHorseBatteryStaple
     [self.corpus_directory]
   end
 
-  def self.find_corpus(corpus_name, formats = [:marshal, :json])
+  def self.corpus_list
+    self.corpus_search_directories.map do |dir|
+      files = Dir[File.join(dir, "*.{#{SUPPORTED_FORMATS.join(',')}}")].
+        map {|file| File.basename(file, File.extname(file)) }
+    end.flatten.sort.uniq
+  end
+
+  def self.find_corpus(corpus_name, formats = SUPPORTED_FORMATS)
     formats.each do |fmt|
       fname = "#{corpus_name}.#{fmt}"
       self.corpus_search_directories.each do |dir|
