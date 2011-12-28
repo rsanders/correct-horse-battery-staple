@@ -3,7 +3,7 @@ require 'logger'
 module CorrectHorseBatteryStaple
   VERSION = '0.1.0'
 
-  DEFAULT_CORPUS_NAME = "wiktionary"
+  DEFAULT_CORPUS_NAME = "tvscripts"
 
   class << self
     attr_accessor :logger
