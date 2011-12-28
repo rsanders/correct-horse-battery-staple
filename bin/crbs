@@ -17,24 +17,51 @@ command :generate do |c|
   #c.example 'description', 'command example'
   c.option '-f FORMAT', '--format FORMAT', 'Set the corpus format'
   c.option '-c CORPUSFILE', '--corpus CORPUSFILE', "File to use as the source corpus"
-  c.option '--wordsize MIN..MAX', 'Set the allowed word size in # of characters'
   c.option '-n COUNT', '--repeat COUNT', Integer, 'How many passwords to generate'
+
+  # filters
+  c.option '-W MIN..MAX', '--wordsize MIN..MAX',
+           'Set the allowed word size in number of characters'
+  c.option '-P MIN..MAX', '--percentile MIN..MAX',
+           'Set the percentile range of the word frequency'
+
   c.action do |args, options|
-    options.default :wordsize => "3..6", :repeat => 1, :corpus => "wiktionary", :format => "json"
+    options.default :wordsize => "3..7", :repeat => 1, :corpus => "wiktionary",
+                    :format => "json", :percentile => "20..90"
 
     number_of_words = (args[0] || 4).to_i
-    wordsize = Range.new *options.wordsize.split('..').map {|x| x.to_i}
     count = options.repeat.to_i
 
     corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
     puts "loaded corpus!" if options.debug
-    if options.verbose
-      puts "Entropy: 2^#{count * corpus.entropy_per_word.floor} bits"
+    unfiltered_size = corpus.length
+    
+    f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize
+
+    unless f_wordsize.begin <= 1 && f_wordsize.end >= 30
+      corpus.filter {|entry| f_wordsize.include? entry.word.length }
     end
 
+    f_percentile = CorrectHorseBatteryStaple::RangeParser.new.parse options.percentile
+    unless f_percentile.include? 0..100
+      corpus.filter {|entry| f_percentile.include? entry.percentile }
+    end
+
+    corpus = corpus.result
+    entropy = number_of_words * corpus.entropy_per_word.floor
+    if options.verbose
+      guesses_per_sec = 1000.0
+      search_space = 2**entropy
+      years = (search_space / guesses_per_sec / (365*24*3600)).round
+      puts "Corpus size: #{corpus.length} candidate words of #{unfiltered_size} total"
+      puts "Entropy: #{entropy} bits (2^#{entropy} = #{search_space})"
+      puts "Years to guess at #{guesses_per_sec} guesses/sec: #{years}"
+    end
+
+    generator = CorrectHorseBatteryStaple::Generator.new(corpus)
+
     count.times do
-      puts CorrectHorseBatteryStaple::Generator.new(corpus, wordsize).
-        make(number_of_words)
+      puts generator.make(number_of_words)
     end
   end
 end

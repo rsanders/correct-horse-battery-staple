@@ -10,9 +10,11 @@ class CorrectHorseBatteryStaple::Generator
 
   attr_accessor :word_length, :corpus
 
-  def initialize(corpus, word_length = 3..6)
+  def initialize(corpus, word_length = nil)
     @corpus      = corpus
-    @word_length = word_length
+    if word_length
+      @corpus.filter {|entry| word_length.include?(entry.word.to_s.length) }
+    end
   end
 
   def make(count=4)
@@ -25,10 +27,7 @@ class CorrectHorseBatteryStaple::Generator
   end
 
   def words
-    @words ||= @corpus.
-      filter {|entry|  @word_length.include?(entry.word.to_s.length)
-    }.
-    result
+    @words ||= @corpus.result
   end
 end
 
