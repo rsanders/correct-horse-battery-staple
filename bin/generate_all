@@ -1,0 +1,17 @@
+#!/bin/sh
+
+formats=(json csv isam)
+
+MKCORPUS="ruby -Ilib ./bin/chbs --trace mkcorpus"
+CONVERT="ruby -Ilib ./bin/chbs --trace convert"
+
+for format in $formats; do
+  $MKCORPUS -i wiktionary -o corpus/gutenberg2005.$format data/wiktionary/gutenberg2005/*
+  $MKCORPUS -i tvscripts -o corpus/tvscripts.$format data/wiktionary/tv-and-movies/*
+  $MKCORPUS -i wordfrequency -o corpus/wordfrequency.$format data/wordfreq/toplemmas/*
+done
+
+$MKCORPUS -i tvscripts --randomize --limit 100 -o corpus/size100.json data/wiktionary/tv-and-movies/*
+for format in csv isam; do
+    $CONVERT corpus/size100.json corpus/size100.$format
+done
