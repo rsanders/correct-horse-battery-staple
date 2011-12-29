@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = "correct-horse-battery-staple"
-  s.version = "0.1.0.20111228234935"
+  s.version = "0.1.0.20111229005526"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Robert Sanders"]
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.email = ["robert@curioussquid.com"]
   s.executables = ["chbs"]
   s.extra_rdoc_files = ["History.txt", "Manifest.txt", "README.txt"]
-  s.files = ["Gemfile", "Gemfile.lock", "History.txt", "Manifest.txt", "README.txt", "Rakefile", "bin/chbs", "corpus/gutenberg2005.csv", "corpus/gutenberg2005.json", "corpus/gutenberg2005.marshal", "corpus/size100.csv", "corpus/size100.json", "corpus/size100.marshal", "corpus/tvscripts.csv", "corpus/tvscripts.json", "corpus/tvscripts.marshal", "corpus/wordfrequency.csv", "corpus/wordfrequency.json", "corpus/wordfrequency.marshal", "lib/correct_horse_battery_staple.rb", "lib/correct_horse_battery_staple/assembler.rb", "lib/correct_horse_battery_staple/corpus.rb", "lib/correct_horse_battery_staple/generator.rb", "lib/correct_horse_battery_staple/parser.rb", "lib/correct_horse_battery_staple/parser/base.rb", "lib/correct_horse_battery_staple/parser/regex.rb", "lib/correct_horse_battery_staple/range_parser.rb", "lib/correct_horse_battery_staple/statistical_array.rb", "lib/correct_horse_battery_staple/word.rb", "spec/corpus_spec.rb", "spec/correct_horse_battery_staple_spec.rb", "spec/fixtures/100.json", "spec/fixtures/corpus1.csv", "spec/fixtures/corpus100.json", "spec/fixtures/wiktionary1000.htm", "spec/range_parser_spec.rb", "spec/spec_helper.rb", "spec/statistical_array_spec.rb", "spec/support/spec_pry.rb", "spec/word_spec.rb", ".gemtest"]
+  s.files = ["Gemfile", "Gemfile.lock", "History.txt", "Manifest.txt", "README.txt", "Rakefile", "bin/chbs", "corpus/gutenberg2005.csv", "corpus/gutenberg2005.json", "corpus/size100.csv", "corpus/size100.json", "corpus/tvscripts.csv", "corpus/tvscripts.json", "corpus/wordfrequency.csv", "corpus/wordfrequency.json", "lib/correct_horse_battery_staple.rb", "lib/correct_horse_battery_staple/assembler.rb", "lib/correct_horse_battery_staple/corpus.rb", "lib/correct_horse_battery_staple/generator.rb", "lib/correct_horse_battery_staple/parser.rb", "lib/correct_horse_battery_staple/parser/base.rb", "lib/correct_horse_battery_staple/parser/regex.rb", "lib/correct_horse_battery_staple/range_parser.rb", "lib/correct_horse_battery_staple/statistical_array.rb", "lib/correct_horse_battery_staple/word.rb", "spec/corpus_spec.rb", "spec/correct_horse_battery_staple_spec.rb", "spec/fixtures/100.json", "spec/fixtures/corpus1.csv", "spec/fixtures/corpus100.json", "spec/fixtures/wiktionary1000.htm", "spec/range_parser_spec.rb", "spec/spec_helper.rb", "spec/statistical_array_spec.rb", "spec/support/spec_pry.rb", "spec/word_spec.rb", ".gemtest"]
   s.homepage = "http://github.com/rsanders/correct-horse-battery-staple"
   s.rdoc_options = ["--main", "README.txt"]
   s.require_paths = ["lib"]

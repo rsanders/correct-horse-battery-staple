@@ -7,16 +7,12 @@ Rakefile
 bin/chbs
 corpus/gutenberg2005.csv
 corpus/gutenberg2005.json
-corpus/gutenberg2005.marshal
 corpus/size100.csv
 corpus/size100.json
-corpus/size100.marshal
 corpus/tvscripts.csv
 corpus/tvscripts.json
-corpus/tvscripts.marshal
 corpus/wordfrequency.csv
 corpus/wordfrequency.json
-corpus/wordfrequency.marshal
 lib/correct_horse_battery_staple.rb
 lib/correct_horse_battery_staple/assembler.rb
 lib/correct_horse_battery_staple/corpus.rb
