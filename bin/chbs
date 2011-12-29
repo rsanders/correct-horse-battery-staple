@@ -88,14 +88,14 @@ command :generate do |c|
   c.action do |args, options|
     options.default :wordsize => "3..7", :repeat => 1,
                     :corpus => CorrectHorseBatteryStaple::DEFAULT_CORPUS_NAME,
-                    :format => "marshal", :percentile => "30..80"
+                    :percentile => "30..80"
 
     number_of_words = (args[0] || 4).to_i
     count = options.repeat.to_i
 
     corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
     puts "loaded corpus!" if options.debug
-    unfiltered_size = corpus.length
+    unfiltered_size = corpus.count
 
     f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize
 

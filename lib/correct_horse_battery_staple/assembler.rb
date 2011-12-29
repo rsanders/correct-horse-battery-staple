@@ -34,7 +34,7 @@ class CorrectHorseBatteryStaple::Assembler
   end
 
   def corpus
-    CorrectHorseBatteryStaple::Corpus.new self.words
+    CorrectHorseBatteryStaple::Corpus::Serialized.new self.words
   end
 
 end

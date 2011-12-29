@@ -6,7 +6,7 @@ module CorrectHorseBatteryStaple
   DEFAULT_CORPUS_NAME = "tvscripts"
 
   SUPPORTED_FORMATS = %w[marshal json csv]
-  
+
   class << self
     attr_accessor :logger
   end
@@ -38,14 +38,14 @@ module CorrectHorseBatteryStaple
     nil
   end
 
-  def self.load_corpus(corpus_name, formats = "json")
-    formats = Array(formats)
+  def self.load_corpus(corpus_name, formats = nil)
+    formats = Array(formats || SUPPORTED_FORMATS)
     filename = corpus_name.match(/[.?]/) ? corpus_name :
       self.find_corpus(corpus_name, formats)
     unless filename && File.exist?(filename)
       raise ArgumentError, "Cannot find corpus #{corpus_name}"
     end
-    CorrectHorseBatteryStaple::Corpus.read filename
+    CorrectHorseBatteryStaple::Corpus::Serialized.read filename
   end
 
   def self.generate(length = 4)

@@ -1,6 +1,6 @@
-require File.join(File.dirname(__FILE__), "spec_helper")
+require File.join(File.dirname(__FILE__), "../spec_helper")
 
-describe CorrectHorseBatteryStaple::Corpus do
+describe CorrectHorseBatteryStaple::Corpus::Serialized do
 
   subject { corpus }
 
@@ -12,6 +12,17 @@ describe CorrectHorseBatteryStaple::Corpus do
     CorrectHorseBatteryStaple::Corpus::Serialized.read_json json_file
   end
 
+  context 'loading CSV' do
+    subject { corpus }
+
+    it "should be the right size" do
+      subject.length.should == 100
+    end
+
+    it "should have a word column" do
+      subject[0][:word].should_not be_empty
+    end
+  end
 
   context 'filtering' do
     it { should respond_to(:filter) }
@@ -39,6 +50,7 @@ describe CorrectHorseBatteryStaple::Corpus do
 
     it 'should return a new object from #result'  do
       evens.result.should_not equal(corpus)
+      evens.result.should be_instance_of(CorrectHorseBatteryStaple::Corpus::Serialized)
     end
 
     it 'should reduce the count with one filter'  do
