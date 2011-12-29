@@ -21,8 +21,8 @@ lib/correct_horse_battery_staple.rb
 lib/correct_horse_battery_staple/assembler.rb
 lib/correct_horse_battery_staple/corpus.rb
 lib/correct_horse_battery_staple/corpus/base.rb
-lib/correct_horse_battery_staple/corpus/serialized.rb
 lib/correct_horse_battery_staple/corpus/isam.rb
+lib/correct_horse_battery_staple/corpus/serialized.rb
 lib/correct_horse_battery_staple/generator.rb
 lib/correct_horse_battery_staple/parser.rb
 lib/correct_horse_battery_staple/parser/base.rb
@@ -30,6 +30,14 @@ lib/correct_horse_battery_staple/parser/regex.rb
 lib/correct_horse_battery_staple/range_parser.rb
 lib/correct_horse_battery_staple/statistical_array.rb
 lib/correct_horse_battery_staple/word.rb
+lib/correct_horse_battery_staple/writer.rb
+lib/correct_horse_battery_staple/writer/base.rb
+lib/correct_horse_battery_staple/writer/csv.rb
+lib/correct_horse_battery_staple/writer/file.rb
+lib/correct_horse_battery_staple/writer/isam.rb
+lib/correct_horse_battery_staple/writer/json.rb
+lib/correct_horse_battery_staple/writer/marshal.rb
+spec/corpus/serialized_spec.rb
 spec/corpus_spec.rb
 spec/correct_horse_battery_staple_spec.rb
 spec/fixtures/100.json
