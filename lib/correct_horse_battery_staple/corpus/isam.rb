@@ -83,9 +83,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     filters = Array(options[:filter])
 
-    file_range = file_range_for_percentile(options[:percentile] || (0..100))
-    readmethod = IO.respond_to?(:binread) ? :binread : :read
-    string     = IO.send(readmethod, @filename, file_range.count, file_range.first)
+    string     = cached_file_range_read(options[:percentile] || (0..100))
 
     range_size = string.length / ENTRY_LENGTH
 
@@ -122,5 +120,15 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     raise "Cannot find #{count} words matching criteria" if result.count < count
     result
+  end
+
+  def cached_file_range_read(percentile_range)
+    if @cached_range != percentile_range
+      file_range = file_range_for_percentile(percentile_range)
+      readmethod = IO.respond_to?(:binread) ? :binread : :read
+      @cached_string = IO.send(readmethod, @filename, file_range.count, file_range.first)
+      @cached_range  = percentile_range
+    end
+    @cached_string
   end
 end
