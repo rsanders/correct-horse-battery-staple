@@ -44,8 +44,7 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
     @stats   = stats
     @filters = []
 
-    self.original_size = @table.length
-    recalculate
+    self.original_size = @table.size
   end
 
   def each(&block)
@@ -53,30 +52,11 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
   end
 
   def result
+    return self if @filters.empty?
+
     self.class.new(execute_filters).tap do |new_corpus|
       new_corpus.original_size = self.original_size
-      new_corpus.recalculate
     end
-  end
-
-  #
-  # Note that this mutates the Word objects so that stats for the
-  # source table after a filter.result sequence will no longer be
-  # valid. Also, any references to the original array will now be
-  # pointing to updated data.
-  #
-  def recalculate
-    super
-    
-    @table.each_with_index do |entry, index|
-      entry.rank                      = size - index
-      entry.distance                  = (entry.frequency-frequency_mean)/frequency_stddev
-      entry.probability               = entry.frequency / weighted_size
-      entry.distance_probability      = (entry.probability - probability_mean) / probability_stddev
-      entry.percentile                = (index-0.5)/size * 100
-    end
-
-    self
   end
 
   def size

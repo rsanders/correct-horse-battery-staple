@@ -98,7 +98,6 @@ command :generate do |c|
     unfiltered_size = corpus.count
 
     f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize
-
     unless f_wordsize.begin <= 1 && f_wordsize.end >= 30
       corpus.filter {|entry| f_wordsize.include? entry.word.length }
     end
