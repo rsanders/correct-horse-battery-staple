@@ -71,6 +71,7 @@ module CorrectHorseBatteryStaple
   autoload :Parser, 'correct_horse_battery_staple/parser'
   autoload :StatisticalArray, 'correct_horse_battery_staple/statistical_array'
   autoload :RangeParser, 'correct_horse_battery_staple/range_parser'
+  autoload :Writer, 'correct_horse_battery_staple/writer'
 end
 
 

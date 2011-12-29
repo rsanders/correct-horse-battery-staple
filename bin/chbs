@@ -38,10 +38,10 @@ command :convert do |c|
     infile = args[0]
     outfile = args[1] && args[1] != "-" ? open(args[1], "w") : STDOUT
 
-    options.iformat ||= (File.extname(infile)[1..-1].downcase rescue "json")
+    options.iformat ||= CorrectHorseBatteryStaple::Corpus.format_for(infile)
     unless options.oformat
       if args[1]
-        options.oformat = File.extname(args[1])[1..-1].downcase
+        options.oformat = CorrectHorseBatteryStaple::Corpus.format_for(args[1])
       else
         raise ArgumentError, "You must supply an output format via the file extension or -o option"
       end
@@ -54,7 +54,11 @@ command :convert do |c|
     if options.limit > -1
       corpus.table.slice!(options.limit..-1) if corpus.size > options.limit
     end
-    corpus.write(outfile, options.oformat)
+
+    # corpus.write(outfile, options.oformat)
+    writer = CorrectHorseBatteryStaple::Writer.make_writer(outfile, options.oformat)
+    writer.write_corpus(corpus)
+    writer.close
   end
 end
 
@@ -63,7 +67,7 @@ command :stats do |c|
   c.summary = 'Show statistics from a corpus'
 
   c.action do |args,options|
-    corpus = CorrectHorseBatteryStaple.load_corpus(args[0])
+    corpus = CorrectHorseBatteryStaple::Corpus.read(args[0])
 
     stats = corpus.stats
     stats.to_hash.each do |key, val|
@@ -148,8 +152,9 @@ command :mkcorpus do |c|
   c.summary = 'Generate a JSON or CSV corpus from an input file'
   #c.description = ''
   #c.example 'description', 'command example'
-  c.option '-i FORMAT', '--iformat FORMAT', 'Set the input format - "wiktionary" or "wordfrequency"'
-  c.option '-o FORMAT', '--oformat FORMAT', 'Set the output format - "marshal", "json", or "csv"'
+  c.option '-o FILENAME', '--output FILENAME', 'Set the output filename or spec'
+  c.option '-I FORMAT', '--iformat FORMAT', 'Set the input format - "wiktionary" or "wordfrequency"'
+  c.option '-O FORMAT', '--oformat FORMAT', 'Set the output format - "marshal", "json", or "csv"'
   c.option '-R', '--randomize', 'Randomize word order'
   c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
   c.action do |args, options|
@@ -163,12 +168,17 @@ command :mkcorpus do |c|
       assembler.limit(options.limit)
     end
     corpus = assembler.corpus
-    case options.oformat.to_sym
-      when :json    then corpus.write_json(STDOUT)
-      when :csv     then corpus.write_csv(STDOUT)
-      when :marshal then corpus.write_marshal(STDOUT)
-      else raise ArgumentError, "Supported output formats are 'marshal', 'json', and 'csv'"
-    end
+
+    destination = options.output || "-"
+
+    CorrectHorseBatteryStaple::Writer.write(corpus, destination, options.oformat)
+
+    # case options.oformat.to_sym
+    #   when :json    then corpus.write_json(STDOUT)
+    #   when :csv     then corpus.write_csv(STDOUT)
+    #   when :marshal then corpus.write_marshal(STDOUT)
+    #   else raise ArgumentError, "Supported output formats are 'marshal', 'json', and 'csv'"
+    # end
   end
 end
 
