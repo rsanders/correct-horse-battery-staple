@@ -17,7 +17,7 @@ class CorrectHorseBatteryStaple::Generator
   end
 
   def make(count = 4, options = {})
-    @corpus.pick(count).
+    @corpus.pick(count, options).
       map {|entry| entry.word.downcase }.
       join("-")
   end
