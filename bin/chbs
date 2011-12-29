@@ -48,7 +48,9 @@ command :convert do |c|
     end
 
     corpus = CorrectHorseBatteryStaple.load_corpus(args[0], options.iformat)
-    corpus.recalculate if options.recalculate
+
+    # CSV doesn't currently persist stats
+    corpus.recalculate if options.recalculate || options.iformat.to_s == "csv"
 
     corpus.table.shuffle! if options.randomize
     if options.limit > -1
@@ -168,7 +170,6 @@ command :mkcorpus do |c|
       assembler.limit(options.limit)
     end
     corpus = assembler.corpus
-    corpus.recalculate
 
     destination = options.output || "-"
 

@@ -56,9 +56,9 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     @prelude || parse_prelude 
   end
 
-  def stats
-    @prelude["stats"] || {}
-  end
+  # def stats
+  #   @prelude["stats"] || {}
+  # end
 
   def parse_prelude
     prelude_buf = binread(@filename, INITIAL_PRELUDE_LENGTH)
@@ -84,6 +84,8 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     # total length of record
     @entry_length     = @prelude["entrylen"] or raise "Prelude does not include entrylen!"
+
+    load_stats_from_hash(@prelude["stats"]) if @prelude["stats"]
 
     @prelude
   end

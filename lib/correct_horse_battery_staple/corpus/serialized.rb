@@ -17,6 +17,10 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
     @stats   = stats
     @filters = []
 
+    if stats && !stats.empty?
+      load_stats_from_hash(stats)
+    end
+
     self.original_size = @table.size
   end
 

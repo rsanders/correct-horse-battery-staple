@@ -126,6 +126,13 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
   ## statistics
 
+  def load_stats_from_hash(hash)
+    hash.each do |k,v|
+      setter = "#{k}=".to_sym
+      send setter, v if respond_to?(setter)
+    end
+  end
+
   def recalculate
     size        = self.count
     frequencies = self.frequencies
@@ -138,6 +145,22 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
       end).mean_and_standard_deviation
 
     (self.frequency_mean, self.frequency_stddev) = frequencies.mean_and_standard_deviation
+
+      # stats              = corpus.stats
+      # size               = corpus.count
+      # frequency_mean     = corpus.frequency_mean
+      # frequency_stddev   = corpus.frequency_stddev
+      # weighted_size      = corpus.weighted_size
+      # probability_mean   = corpus.probability_mean
+      # probability_stddev = corpus.probability_stddev
+
+    each_with_index do |entry, index|
+      entry.rank                      = size - index
+      entry.distance                  = (entry.frequency-frequency_mean)/frequency_stddev
+      entry.probability               = entry.frequency / weighted_size
+      entry.distance_probability      = (entry.probability - probability_mean) / probability_stddev
+      entry.percentile                = (index-0.5)/size * 100
+    end
 
     self
   end
