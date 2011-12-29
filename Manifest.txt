@@ -6,6 +6,7 @@ README.txt
 Rakefile
 bin/chbs
 bin/chbs-mkpass
+bin/generate_all
 corpus/gutenberg2005.csv
 corpus/gutenberg2005.json
 corpus/gutenberg2005.isam
