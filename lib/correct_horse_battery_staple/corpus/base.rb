@@ -67,7 +67,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     iterations = 0
     while result.count < count && iterations < max_iterations
       i = rng.random_number(range_size)
-      entry = array[i]
+      entry = array[i + range.first]
       if entry && (!filter || filter.call(entry))
         result << entry
       end
