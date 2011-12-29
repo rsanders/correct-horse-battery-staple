@@ -5,7 +5,7 @@ module CorrectHorseBatteryStaple
 
   DEFAULT_CORPUS_NAME = "tvscripts"
 
-  SUPPORTED_FORMATS = %w[marshal json csv]
+  SUPPORTED_FORMATS = %w[isam marshal json csv]
 
   class << self
     attr_accessor :logger
