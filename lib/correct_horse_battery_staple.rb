@@ -64,14 +64,15 @@ module CorrectHorseBatteryStaple
       CorrectHorseBatteryStaple.logger
     end
   end
+
+  autoload :Word, 'correct_horse_battery_staple/word'
+  autoload :Generator, 'correct_horse_battery_staple/generator'
+  autoload :Corpus, 'correct_horse_battery_staple/corpus'
+  autoload :Parser, 'correct_horse_battery_staple/parser'
+  autoload :StatisticalArray, 'correct_horse_battery_staple/statistical_array'
+  autoload :RangeParser, 'correct_horse_battery_staple/range_parser'
 end
 
-require 'correct_horse_battery_staple/word'
-require 'correct_horse_battery_staple/generator'
-require 'correct_horse_battery_staple/corpus'
-require 'correct_horse_battery_staple/parser'
-require 'correct_horse_battery_staple/statistical_array'
-require 'correct_horse_battery_staple/range_parser'
 
 if __FILE__ == $0
   puts CorrectHorseBatteryStaple.generate((ARGV[0] || 4).to_i)

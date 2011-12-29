@@ -9,8 +9,9 @@ class CorrectHorseBatteryStaple::Corpus
 
     clazz.read(filename)
   end
+
+  autoload :Base, 'correct_horse_battery_staple/corpus/base'
+  autoload :Serialized, 'correct_horse_battery_staple/corpus/serialized'
+  autoload :Isam,'correct_horse_battery_staple/corpus/isam'
 end
 
-require 'correct_horse_battery_staple/corpus/base'
-require 'correct_horse_battery_staple/corpus/serialized'
-require 'correct_horse_battery_staple/corpus/isam'
