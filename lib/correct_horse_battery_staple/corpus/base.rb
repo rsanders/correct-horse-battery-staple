@@ -1,49 +1,60 @@
 require 'bigdecimal'
 
 class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpus
-  #attr_accessor :frequency_mean, :frequency_stddev
-  #attr_accessor :probability_mean, :probability_stddev
-  #attr_accessor :original_size
-  #attr_accessor :weighted_size
+  attr_accessor :frequency_mean, :frequency_stddev
+  attr_accessor :probability_mean, :probability_stddev
+  attr_accessor :original_size
+  attr_accessor :weighted_size
 
   include CorrectHorseBatteryStaple::Common
   include Enumerable
 
-  def filter(&block)
-    @filters << block
-    self
+  # you MUST override this method for Enumerable to use
+
+  def each(&block)
+    raise NotImplementedError
+  end
+
+  # other methods you should implement if possible:
+  #
+  # Enumerable
+  #  size
+  #
+  # CHBS::Corpus
+  #  pick
+  #  words
+  #  frequencies
+  #
+
+
+  # this is the core password picker method
+  def pick(count, options = {})
+    CorrectHorseBatteryStaple::StatisticalArray.new(entries.map {|entry| entry.frequency })
   end
 
   def entropy_per_word
     Math.log(count) / Math.log(2)
   end
 
-  def reset
-    @filters = []
-  end
-
+
   def words
     execute_filters.map {|entry| entry.word }
   end
 
-  def words
-    raise NotImplementedError
-  end
-
-  def each(&block)
-    raise NotImplementedError
-  end
-
-  def entries
-    to_a
-  end
-
-  def result
-    raise NotImplementedError
-  end
-
   def frequencies
     CorrectHorseBatteryStaple::StatisticalArray.new(entries.map {|entry| entry.frequency })
+  end
+
+
+  # filtering
+
+  def filter(&block)
+    (@filters ||= []) << block
+    self
+  end
+
+  def reset
+    @filters = []
   end
 
   # create a single composed function of all the filters
@@ -54,12 +65,17 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     end
   end
 
-  #
-  # Note that this mutates the Word objects so that stats for the
-  # source table after a filter.result sequence will no longer be
-  # valid. Also, any references to the original array will now be
-  # pointing to updated data.
-  #
+  def result
+    return self if @filters.empty?
+
+    self.class.new(execute_filters).tap do |new_corpus|
+      new_corpus.original_size = self.original_size
+    end
+  end
+
+
+  ## statistics
+
   def recalculate
     size        = self.count
     frequencies = self.frequencies
@@ -85,9 +101,15 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
   alias :length :count
 
+
   protected
 
+  # this is an exceptionally inefficient version
   def execute_filters
-    raise NotImplementedError
+    return entries if @filters.nil? || @filters.empty?
+    entries.select &compose_filters(@filters)
+  ensure
+    reset
   end
+
 end

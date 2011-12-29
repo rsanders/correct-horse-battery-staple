@@ -17,6 +17,31 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
     CSVLIB = CSV
   end
 
+  def initialize(table, stats = nil)
+    @table   = CorrectHorseBatteryStaple::StatisticalArray.cast(table)
+    @stats   = stats
+    @filters = []
+
+    self.original_size = @table.size
+  end
+
+  ## some core Enumerable building blocks
+
+  def each(&block)
+    table.each &block
+  end
+
+  def size
+    table.length
+  end
+
+  def entries
+    table
+  end
+
+  ## serialization
+  # reading
+
   def self.read_csv(file)
     self.new CSVLIB.table(file).map {|row| CorrectHorseBatteryStaple::Word.new(row.to_hash) }
   end
@@ -39,31 +64,7 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
     send "read_#{fformat}", filename
   end
 
-  def initialize(table, stats = nil)
-    @table   = CorrectHorseBatteryStaple::StatisticalArray.cast(table)
-    @stats   = stats
-    @filters = []
-
-    self.original_size = @table.size
-  end
-
-  def each(&block)
-    @table.each &block
-  end
-
-  def result
-    return self if @filters.empty?
-
-    self.class.new(execute_filters).tap do |new_corpus|
-      new_corpus.original_size = self.original_size
-    end
-  end
-
-  def size
-    @table.length
-  end
-
-  # serialization
+  # writing
 
   def write_csv(io)
     io.puts "index,rank,word,frequency,percentile,distance,probability,distance_probability"
@@ -100,18 +101,7 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
     send "write_#{fformat}", io
   end
 
-  def table
-    @table
-  end
-
   protected
-
-  def execute_filters
-    return @table if @filters.nil? || @filters.empty?
-    @table.select &compose_filters(@filters)
-  ensure
-    reset
-  end
 
   def method_missing(name, *args, &block)
     @table.__send__(name, *args, &block)
