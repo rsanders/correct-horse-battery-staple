@@ -11,6 +11,7 @@ corpus/gutenberg2005.json
 corpus/gutenberg2005.isam
 corpus/size100.csv
 corpus/size100.json
+corpus/size100.isam
 corpus/tvscripts.csv
 corpus/tvscripts.json
 corpus/tvscripts.isam
@@ -49,3 +50,4 @@ spec/spec_helper.rb
 spec/statistical_array_spec.rb
 spec/support/spec_pry.rb
 spec/word_spec.rb
+correct-horse-battery-staple.gemspec
