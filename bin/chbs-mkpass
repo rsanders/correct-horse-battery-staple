@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'correct_horse_battery_staple'
+
+corpus = CorrectHorseBatteryStaple.load_corpus(ARGV[0] || "tvscripts", "isam")
+
+word_length = 3..9
+percentile = 30..80
+number_of_words = (ARGV[1] || 4).to_i
+
+generator = CorrectHorseBatteryStaple::Generator.new(corpus)
+
+puts generator.make(number_of_words,
+                    :word_length => word_length,
+                    :percentile => percentile)
