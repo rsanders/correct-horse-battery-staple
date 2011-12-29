@@ -1,7 +1,7 @@
 require 'logger'
 
 module CorrectHorseBatteryStaple
-  VERSION = '0.1.1'
+  VERSION = '0.1.2'
 
   DEFAULT_CORPUS_NAME = "tvscripts"
 
