@@ -1,7 +1,7 @@
 require 'bigdecimal'
 require 'json'
 require 'set'
-require 'simple_memoize'
+require 'memoizable'
 
 #
 #
@@ -28,6 +28,7 @@ require 'simple_memoize'
 #
 
 class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpus::Base
+  include Memoizable
 
   INITIAL_PRELUDE_LENGTH = 512
 
@@ -116,7 +117,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   def nth_chunk(n, string)
     string[@entry_length * n, @entry_length]
   end
-  # memoize :nth_chunk
+  memoize :nth_chunk
 
   ## some core Enumerable building blocks
 
@@ -213,7 +214,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     readmethod = IO.respond_to?(:binread) ? :binread : :read
     IO.send(readmethod, @filename, file_range.count, file_range.first + @record_offset)
   end
-  # memoize :file_range_read
+  memoize :file_range_read
 
   def file_percentile_range_read(percentile_range)
     file_range = file_range_for_percentile(percentile_range)

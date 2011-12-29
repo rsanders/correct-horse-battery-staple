@@ -4,6 +4,9 @@ source :rubygems
 gem "fastercsv", :platforms => [:mri_18, :jruby]
 gem "json"
 
+# performance
+gem "memoizable"
+
 # cmdline
 gem "commander"
 platform :jruby do
