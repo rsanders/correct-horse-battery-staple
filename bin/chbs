@@ -13,6 +13,8 @@ global_option '-V', '--verbose', 'Shows request and response'
 
 logger = Logger.new(STDERR)
 
+default_command :generate
+
 command :repl do |c|
   c.action do |args, options|
     require 'pry'
