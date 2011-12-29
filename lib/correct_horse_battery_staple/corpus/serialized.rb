@@ -4,11 +4,6 @@ require 'json'
 class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple::Corpus::Base
   attr_reader   :table
 
-  attr_accessor :frequency_mean, :frequency_stddev
-  attr_accessor :probability_mean, :probability_stddev
-  attr_accessor :original_size
-  attr_accessor :weighted_size
-
   if RUBY_VERSION.start_with? "1.8"
     require 'faster_csv'
     CSVLIB = FasterCSV
@@ -98,6 +93,13 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
 
   def write_marshal(io)
     io.write Marshal.dump(self)
+  end
+
+  def write_isam(io)
+    sorted_entries.each_with_index do |w, index|
+      io.print sprintf("%-40s%10d", w.word, w.frequency || 0) if
+        w.word.length <= 40
+    end
   end
 
   def write(io, fformat=nil)

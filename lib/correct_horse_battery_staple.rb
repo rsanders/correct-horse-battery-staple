@@ -45,7 +45,8 @@ module CorrectHorseBatteryStaple
     unless filename && File.exist?(filename)
       raise ArgumentError, "Cannot find corpus #{corpus_name}"
     end
-    CorrectHorseBatteryStaple::Corpus::Serialized.read filename
+
+    CorrectHorseBatteryStaple::Corpus.read filename
   end
 
   def self.generate(length = 4)
