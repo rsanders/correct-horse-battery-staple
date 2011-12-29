@@ -1,7 +1,7 @@
 class CorrectHorseBatteryStaple::Writer
   def self.make_writer(dest, fformat, options = {})
     fformat ||= CorrectHorseBatteryStaple::Corpus.format_for(dest)
-    raise ArgumentError, "Cannot determine file format for output" if !fformat || fformat.empty?
+    raise ArgumentError, "Cannot determine file format for #{dest}" if !fformat || fformat.empty?
 
     clazz = const_get(fformat.downcase.capitalize)
     writer = clazz.new(dest, options)
