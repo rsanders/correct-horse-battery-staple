@@ -20,10 +20,10 @@ module CorrectHorseBatteryStaple
     [self.corpus_directory]
   end
 
-  def self.corpus_list
+  def self.corpus_list(options = {})
     self.corpus_search_directories.map do |dir|
       files = Dir[File.join(dir, "*.{#{SUPPORTED_FORMATS.join(',')}}")].
-        map {|file| File.basename(file, File.extname(file)) }
+        map {|file| options[:with_paths] ? File.expand_path(file) : File.basename(file, File.extname(file)) }
     end.flatten.sort.uniq
   end
 

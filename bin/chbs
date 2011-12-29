@@ -138,14 +138,15 @@ end
 command :list do |c|
   c.syntax = 'list'
   c.summary = 'Show a list of available corpus names'
+  c.option '-p', '--paths', 'Show paths'
 
   c.action do |args, options|
-    list = CorrectHorseBatteryStaple.corpus_list
+    list = CorrectHorseBatteryStaple.corpus_list(:with_paths => options.paths)
 
     list.each_with_index do |item, i|
-      list[i] = "[#{item}]" if item == CorrectHorseBatteryStaple::DEFAULT_CORPUS_NAME
+      list[i] = "[#{item}]" if item.include? CorrectHorseBatteryStaple::DEFAULT_CORPUS_NAME
     end
-    puts list.sort.join(', ')
+    puts list.sort.join(options.paths ? "\n" : ', ')
   end
 end
 
@@ -176,13 +177,6 @@ command :mkcorpus do |c|
     options.oformat ||= CorrectHorseBatteryStaple::Corpus.format_for(destination)
 
     CorrectHorseBatteryStaple::Writer.write(corpus, destination, options.oformat)
-
-    # case options.oformat.to_sym
-    #   when :json    then corpus.write_json(STDOUT)
-    #   when :csv     then corpus.write_csv(STDOUT)
-    #   when :marshal then corpus.write_marshal(STDOUT)
-    #   else raise ArgumentError, "Supported output formats are 'marshal', 'json', and 'csv'"
-    # end
   end
 end
 
