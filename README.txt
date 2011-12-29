@@ -1,4 +1,4 @@
-= crbs
+= chbs
 
 * FIX (url)
 
@@ -8,7 +8,7 @@ Generate a 4 word password from words of size 3-8 characters, with
 frequencies in the 30th-60th percentile. This range gives a nice set
 of uncommon but not completely alien words.
 
-    crbs generate --verbose -W 3..8 -P 30..60
+    chbs generate --verbose -W 3..8 -P 30..60
     Corpus size: 6396 candidate words of 33075 total
     Entropy: 48 bits (2^48 = 281474976710656)
     Years to guess at 1000 guesses/sec: 8926

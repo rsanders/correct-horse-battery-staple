@@ -60,7 +60,7 @@ class CorrectHorseBatteryStaple::Word
   end
 
   def inspect
-    "CRBS::Word(#{self.to_hash.inspect})"
+    "CHBS::Word(#{self.to_hash.inspect})"
   end
 
   def to_hash
