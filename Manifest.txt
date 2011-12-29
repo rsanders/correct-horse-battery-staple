@@ -4,7 +4,7 @@ History.txt
 Manifest.txt
 README.txt
 Rakefile
-bin/crbs
+bin/chbs
 corpus/gutenberg2005.csv
 corpus/gutenberg2005.json
 corpus/gutenberg2005.marshal
