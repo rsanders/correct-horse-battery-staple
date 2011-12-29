@@ -1,7 +1,6 @@
 require 'bigdecimal'
 require 'json'
 require 'set'
-require 'memoizable'
 
 #
 #
@@ -14,11 +13,12 @@ require 'memoizable'
 #
 # Contents of Prelude (after JSON decoding):
 #
-# P["wlen"]   - length of word part of record
-# P["flen"]   - length of frequency part of record (always 4 bytes)
-# P["tlen"]   - length of total part of record
-# P["n"]      - number of records
-# P["sort"]   - field name sorted by (word or frequency)
+# P["wlen"]     - length of word part of record
+# P["flen"]     - length of frequency part of record (always 4 bytes)
+# P["entrylen"] - length of total part of record
+# P["n"]        - number of records
+# P["sort"]     - field name sorted by (word or frequency)
+# P["stats"]    - corpus statistics
 #
 # Format of record:
 #
@@ -28,8 +28,6 @@ require 'memoizable'
 #
 
 class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpus::Base
-  include Memoizable
-
   INITIAL_PRELUDE_LENGTH = 512
 
   def initialize(filename, stats = nil)
@@ -37,12 +35,33 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     parse_prelude
   end
 
+  def self.memoize(method)
+    old_method = "_#{method}_unmemoized".to_sym
+    miss_object = Object.new
+    alias_method old_method, method
+    define_method method do |*args, &block|
+      @_memoize_cache ||= {}
+      if block
+        raise ArgumentError, "You cannot call a memoized method with a block! #{method}"
+      end
+      value = @_memoize_cache.fetch(args, miss_object)
+      if value === miss_object
+        value = @_memoize_cache[args] = send(old_method, *args)
+      end
+      value
+    end
+  end
+
   def prelude
     @prelude || parse_prelude 
   end
 
+  def stats
+    @prelude["stats"] || {}
+  end
+
   def parse_prelude
-    prelude_buf = IO.read(@filename, INITIAL_PRELUDE_LENGTH)
+    prelude_buf = binread(@filename, INITIAL_PRELUDE_LENGTH)
 
     # byte offset of first record from beginning of file
     # total length of JSON string (without padding)
@@ -50,7 +69,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     # read more if our initial read didn't slurp in the entire prelude
     if @prelude_len > prelude_buf.length
-      prelude_buf += IO.read(@filename,
+      prelude_buf += binread(@filename,
                              @prelude_len - prelude_buf.length,
                              INITIAL_PRELUDE_LENGTH)
     end
@@ -58,7 +77,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     @prelude = JSON.parse( prelude_buf.unpack("@8a#{@prelude_len}")[0] ) || {}
 
     # includes prefix length byte
-    @word_length      = @prelude["wlen"]     or 26
+    @word_length      = @prelude["wlen"]     or raise "Word length is not defined!"
 
     # as network byte order int
     @frequency_length = @prelude["flen"]     or 4
@@ -85,7 +104,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     chunk = nth_chunk(index, string)
     raise "No chunk for index #{index}" unless chunk
     actual_word_length = chunk.unpack("C")[0]
-    # STDERR.puts "awl = #{actual_word_length}, chunk = #{chunk.inspect}"
+    # STDERR.puts "awl = #{actual_word_length}, chunk = #{chunk[0..4].inspect}"
     if !length_range || length_range.include?(actual_word_length)
       # returns [word, frequency]
       chunk.unpack("xa#{actual_word_length}@#{@word_length}N")
@@ -117,7 +136,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   def nth_chunk(n, string)
     string[@entry_length * n, @entry_length]
   end
-  memoize :nth_chunk
+  # memoize :nth_chunk
 
   ## some core Enumerable building blocks
 
@@ -199,6 +218,11 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
   ## file I/O
 
+  def binread(*args)
+    method = IO.respond_to?(:binread) ? :binread : :read
+    IO.send(method, *args)
+  end
+
   def records_size
     @records_size ||= (File.size(@filename) - @record_offset)
   end
@@ -206,19 +230,16 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   # returns a string representing the record-holding portion of the file
   def records_string
     @records_string ||=
-      IO.read(@filename, records_size, @record_offset)
+      binread(@filename, records_size, @record_offset)
   end
 
   def file_range_read(file_range)
-    # STDERR.puts "reading range #{file_range}, count = #{file_range.count}, first = #{file_range.first}"
-    readmethod = IO.respond_to?(:binread) ? :binread : :read
-    IO.send(readmethod, @filename, file_range.count, file_range.first + @record_offset)
+    binread(@filename, file_range.count, file_range.first + @record_offset)
   end
   memoize :file_range_read
 
   def file_percentile_range_read(percentile_range)
     file_range = file_range_for_percentile(percentile_range)
-    # STDERR.puts "for #{percentile_range}, file_range = #{file_range}"
     file_range_read(file_range)
   end
 
@@ -234,5 +255,6 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     (percentile_index(range.begin, false).floor * @entry_length ...
      percentile_index(range.end,   false).ceil * @entry_length)
   end
+
 
 end

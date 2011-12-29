@@ -2,20 +2,39 @@ class CorrectHorseBatteryStaple::Writer::Isam < CorrectHorseBatteryStaple::Write
 
   def initialize(dest, options={})
     super
-    # including prefix length byte
-    @word_length = 26
-    @freq_length = 4
-    @entry_length = @word_length + @freq_length
   end
 
   def write_corpus(corpus)
-    prelude = {"wlen" => @word_length, "flen" => 4, "entrylen" => @entry_length}.to_json
+    # includes prefix length byte
+    @word_length = corpus.reduce(0) { |m, e| m > e.word.length ? m : e.word.length } + 1
+    @freq_length = 4
+    @entry_length = @word_length + @freq_length
+
+    STDERR.puts "word length is #{@word_length}"
+    prelude = {
+      "wlen"     => @word_length,
+      "flen"     => 4,
+      "entrylen" => @word_length + @freq_length,
+      "sort"     => "frequency",
+      "n"        => corpus.length,
+      "stats"    => corpus.stats
+    }.to_json
     record_offset = [((prelude.length+8.0)/512).ceil, 1].max * 512
-    io.write (pre=[record_offset, prelude.length, prelude].pack("NNA#{record_offset-8}"))
+    io.write(pre=[record_offset, prelude.length, prelude].pack("NNA#{record_offset-8}"))
     # STDERR.puts "pre size is #{pre.length}"
     corpus.each_with_index do |w, index|
-      io.write (s=[w.word.length, w.word, w.frequency].pack("Ca#{@word_length-1}N"))
+      io.write(s=[w.word.length, w.word, w.frequency].pack("Ca#{@word_length-1}N"))
       # STDERR.puts "s size is #{s.length}"
     end
   end
+
+  def binwrite(*args)
+    method = io.respond_to?(:binwrite) ? :binwrite : :write
+    io.send(method, *args)
+  end
+
+  def openmode
+    IO.respond_to?(:binwrite) ? "wb:ASCII-8BIT" : "w"
+  end
+
 end

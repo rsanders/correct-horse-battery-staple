@@ -15,7 +15,7 @@ class CorrectHorseBatteryStaple::Writer::File < CorrectHorseBatteryStaple::Write
       if ["/dev/stdout", "-"].include?(dest)
         self.io = STDOUT
       else
-        self.io = open(dest, "w")
+        self.io = open(dest, openmode)
         @do_close = true
       end
     end
@@ -30,6 +30,10 @@ class CorrectHorseBatteryStaple::Writer::File < CorrectHorseBatteryStaple::Write
   end
 
   protected
+
+  def openmode
+    "w"
+  end
 
   def <<(string)
     self.io.write string
