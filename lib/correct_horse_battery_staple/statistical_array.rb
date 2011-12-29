@@ -6,9 +6,12 @@ module CorrectHorseBatteryStaple
       @sorted = sorted
     end
 
-    def self.cast(array)
-      array.is_a?(CorrectHorseBatteryStaple::StatisticalArray) ? array :
-        CorrectHorseBatteryStaple::StatisticalArray.new(array)
+    def self.cast(array, sorted=false)
+      if array.is_a?(CorrectHorseBatteryStaple::StatisticalArray)
+        array
+      else
+        CorrectHorseBatteryStaple::StatisticalArray.new(array, sorted)
+      end
     end
 
     def sort!

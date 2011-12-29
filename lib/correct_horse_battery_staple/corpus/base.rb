@@ -1,4 +1,5 @@
 require 'bigdecimal'
+require 'securerandom'
 
 class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpus
   attr_accessor :frequency_mean, :frequency_stddev
@@ -27,16 +28,62 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   #
 
 
-  # this is the core password picker method
-  def pick(count, options = {})
-    CorrectHorseBatteryStaple::StatisticalArray.new(entries.map {|entry| entry.frequency })
+  def sorted_entries
+    entries.sort
   end
 
-  def entropy_per_word
-    Math.log(count) / Math.log(2)
+  #
+  # this is the core password picker method. it is not especially
+  # efficient but it is relatively generic.  If a corpus supports
+  # Enumerable, it will work.
+  #
+  def pick(count, options = {})
+    array = CorrectHorseBatteryStaple::StatisticalArray.new(sorted_entries)
+    rng = options[:rng] || self.rng
+
+    filters = Array(options[:filter])
+
+    if options[:percentile]
+      range = array.index_range_for_percentile(options[:percentile])
+    else
+      range = 0..array.size-1
+    end
+    range_size = range.count
+
+    if range_size < count
+      raise ArgumentError, "Percentile range contains fewer words than requested count"
+    end
+
+    if options[:word_length]
+      wl = options[:word_length]
+      filters << lambda {|entry| wl.include? entry.word.length }
+    end
+
+    filter = filters.empty? ? nil : compose_filters(filters)
+
+    max_iterations = options[:max_iterations] || 1000
+
+    result = []
+    iterations = 0
+    while result.count < count && iterations < max_iterations
+      i = rng.random_number(range_size)
+      entry = array[i]
+      if entry && (!filter || filter.call(entry))
+        result << entry
+      end
+      iterations += 1
+    end
+
+    raise "Cannot find #{count} words matching criteria" if result.count < count
+    result
   end
+
 
 
+  def rng
+    @rng ||= SecureRandom
+  end
+
   def words
     execute_filters.map {|entry| entry.word }
   end
@@ -45,6 +92,9 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     CorrectHorseBatteryStaple::StatisticalArray.new(entries.map {|entry| entry.frequency })
   end
 
+  def entropy_per_word
+    Math.log(count) / Math.log(2)
+  end
 
   # filtering
 

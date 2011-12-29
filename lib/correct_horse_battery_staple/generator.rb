@@ -16,12 +16,9 @@ class CorrectHorseBatteryStaple::Generator
     end
   end
 
-  def make(count=4)
-    words.
-      values_at(
-        *count.times.map { SecureRandom.random_number(words.length) }
-      ).
-      map { |word| word.word.downcase }.
+  def make(count = 4, options = {})
+    @corpus.pick(count).
+      map {|entry| entry.word.downcase }.
       join("-")
   end
 

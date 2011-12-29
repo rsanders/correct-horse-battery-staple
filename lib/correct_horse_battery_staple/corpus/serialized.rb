@@ -18,7 +18,7 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
   end
 
   def initialize(table, stats = nil)
-    @table   = CorrectHorseBatteryStaple::StatisticalArray.cast(table)
+    @table   = CorrectHorseBatteryStaple::StatisticalArray.cast(table.sort, true)
     @stats   = stats
     @filters = []
 
@@ -36,6 +36,10 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
   end
 
   def entries
+    table
+  end
+
+  def sorted_entries
     table
   end
 

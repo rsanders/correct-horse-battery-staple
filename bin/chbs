@@ -97,17 +97,17 @@ command :generate do |c|
     puts "loaded corpus!" if options.debug
     unfiltered_size = corpus.count
 
+    make_options = {}
+
     f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize
     unless f_wordsize.begin <= 1 && f_wordsize.end >= 30
-      corpus.filter {|entry| f_wordsize.include? entry.word.length }
+      make_options[:word_length] = f_wordsize
     end
 
     f_percentile = CorrectHorseBatteryStaple::RangeParser.new.parse options.percentile
     unless f_percentile.include? 0..100
-      corpus.filter {|entry| f_percentile.include? entry.percentile }
+      make_options[:percentile] = f_percentile
     end
-
-    corpus = corpus.result
 
     entropy = number_of_words * corpus.entropy_per_word.floor
     if options.verbose
@@ -122,7 +122,7 @@ command :generate do |c|
     generator = CorrectHorseBatteryStaple::Generator.new(corpus)
 
     count.times do
-      puts generator.make(number_of_words)
+      puts generator.make(number_of_words, make_options)
     end
   end
 end
