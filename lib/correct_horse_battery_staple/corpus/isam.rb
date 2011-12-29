@@ -136,7 +136,6 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   def nth_chunk(n, string)
     string[@entry_length * n, @entry_length]
   end
-  # memoize :nth_chunk
 
   ## some core Enumerable building blocks
 
