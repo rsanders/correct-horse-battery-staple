@@ -40,10 +40,13 @@ class CorrectHorseBatteryStaple::Word
   def initialize(value_map = {})
     raise ArgumentError, "Must supply at least :word" unless value_map[:word] || value_map["word"]
 
+    # phasing this out
+    self.index = -1
+
     case value_map
-      when Hash then     update_from_hash(value_map)
+      when Hash then update_from_hash(value_map)
       when CorrectHorseBatteryStaple::Word then update_from_hash(value_map.to_hash)
-      else raise "What? #{value_map}"
+      else raise "Can't initialize Word from #{value_map.inspect}"
     end
   end
 
