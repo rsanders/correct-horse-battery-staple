@@ -5,6 +5,7 @@ Manifest.txt
 README.txt
 Rakefile
 bin/chbs
+bin/chbs-mkpass
 corpus/gutenberg2005.csv
 corpus/gutenberg2005.json
 corpus/gutenberg2005.isam
