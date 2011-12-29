@@ -158,7 +158,7 @@ command :mkcorpus do |c|
   c.option '-R', '--randomize', 'Randomize word order'
   c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
   c.action do |args, options|
-    options.default :iformat => "wiktionary", :oformat => "json", :limit => -1
+    options.default :iformat => "wiktionary", :limit => -1
 
     assembler = CorrectHorseBatteryStaple::Assembler.new(
       CorrectHorseBatteryStaple::Parser::Regex.new(options.iformat.to_sym))
@@ -168,8 +168,11 @@ command :mkcorpus do |c|
       assembler.limit(options.limit)
     end
     corpus = assembler.corpus
+    corpus.recalculate
 
     destination = options.output || "-"
+
+    options.oformat ||= CorrectHorseBatteryStaple::Corpus.format_for(destination)
 
     CorrectHorseBatteryStaple::Writer.write(corpus, destination, options.oformat)
 
