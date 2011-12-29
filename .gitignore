@@ -1,3 +1,5 @@
 .rvmrc
 .tddium*
 .tddium
+pkg
+*.gem
