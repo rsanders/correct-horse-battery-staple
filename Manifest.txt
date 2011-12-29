@@ -16,6 +16,8 @@ corpus/wordfrequency.json
 lib/correct_horse_battery_staple.rb
 lib/correct_horse_battery_staple/assembler.rb
 lib/correct_horse_battery_staple/corpus.rb
+lib/correct_horse_battery_staple/corpus/base.rb
+lib/correct_horse_battery_staple/corpus/serialized.rb
 lib/correct_horse_battery_staple/generator.rb
 lib/correct_horse_battery_staple/parser.rb
 lib/correct_horse_battery_staple/parser/base.rb
