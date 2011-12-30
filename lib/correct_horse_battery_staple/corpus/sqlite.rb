@@ -4,6 +4,7 @@ require 'sqlite3'
 class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Corpus::Base
   def initialize(file)
     @db = SQLite3::Database.open file
+    load_stats
   end
 
   def self.read(file)
@@ -57,7 +58,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
     result
   end
-  
+
   protected
 
   COLUMNS = %w[word frequency idx rank percentile]
@@ -71,5 +72,10 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
   def word_from_row(row)
     CorrectHorseBatteryStaple::Word.new(:word => row[0], :frequency => row[1],
                                         :index => row[2], :rank => row[3], :percentile => row[4])
+  end
+
+  def load_stats
+    rows = @db.execute "select name, value from stats"
+    load_stats_from_hash(rows.reduce({}) {|m, (key, val)| m.merge(key => val.to_f)})
   end
 end
