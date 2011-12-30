@@ -28,6 +28,36 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     entries
   end
 
+
+  ## optimized pick - does NOT support :filter, though
+
+  def pick(count, options = {})
+    # incompat check
+    raise NotImplementedError, "SQLite does not support :filter option" if options[:filter]
+
+    statement = "select #{COLUMNS.join(", ")} from entries "
+    params = []
+    wheres = []
+    if options[:word_length]
+      wheres << "  wordlength >= ? and wordlength <= ? "
+      params += [options[:word_length].first, options[:word_length].last]
+    end
+    if options[:percentile]
+      wheres << "  percentile >= ? and percentile <= ? "
+      params += [options[:percentile].first, options[:percentile].last]
+    end
+    statement = statement + (wheres.empty? ? "" : " WHERE " + wheres.join(" AND ")) +
+      " order by RANDOM() limit #{count}"
+
+    rows = @db.execute(statement, *params)
+    result = rows.map { |row| word_from_row(row) }
+
+    # validate that we succeeded
+    raise "Cannot find #{count} words matching criteria" if result.count < count
+
+    result
+  end
+  
   protected
 
   COLUMNS = %w[word frequency idx rank percentile]
