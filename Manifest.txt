@@ -6,7 +6,6 @@ README.txt
 Rakefile
 bin/chbs
 bin/chbs-mkpass
-bin/generate_all
 corpus/gutenberg2005.csv
 corpus/gutenberg2005.json
 corpus/gutenberg2005.isam
@@ -39,6 +38,7 @@ lib/correct_horse_battery_staple/writer/file.rb
 lib/correct_horse_battery_staple/writer/isam.rb
 lib/correct_horse_battery_staple/writer/json.rb
 lib/correct_horse_battery_staple/writer/marshal.rb
+script/generate_all
 spec/corpus/serialized_spec.rb
 spec/corpus_spec.rb
 spec/correct_horse_battery_staple_spec.rb
