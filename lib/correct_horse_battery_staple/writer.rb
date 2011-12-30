@@ -22,4 +22,5 @@ class CorrectHorseBatteryStaple::Writer
   autoload :Csv,      "correct_horse_battery_staple/writer/csv"
   autoload :Isam,     "correct_horse_battery_staple/writer/isam"
   autoload :Marshal,  "correct_horse_battery_staple/writer/marshal"
+  autoload :Sqlite,   "correct_horse_battery_staple/writer/sqlite"
 end

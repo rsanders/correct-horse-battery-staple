@@ -7,6 +7,10 @@ gem "json"
 # performance
 gem "memoizable"
 
+# external DBs
+gem "sqlite3"
+gem "redis"
+
 # cmdline
 gem "commander"
 platform :jruby do
