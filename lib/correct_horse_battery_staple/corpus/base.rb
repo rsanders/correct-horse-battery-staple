@@ -89,7 +89,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   end
 
   # no-op for serialized forms
-  def precache
+  def precache(max=0)
   end
 
   def frequencies
