@@ -48,6 +48,7 @@ command :convert do |c|
     end
 
     corpus = CorrectHorseBatteryStaple.load_corpus(args[0], options.iformat)
+    corpus.precache(16_000_000)
 
     # CSV doesn't currently persist stats
     corpus.recalculate if options.recalculate || options.iformat.to_s == "csv"
@@ -103,11 +104,11 @@ command :generate do |c|
 
     corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
     if count > 1
-      corpus.precache
+      corpus.precache(4_000_000)
     end
     puts "loaded corpus!" if options.debug
     unfiltered_size = corpus.count
-    
+
     make_options = {}
 
     f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize

@@ -36,7 +36,8 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     parse_prelude
   end
 
-  def precache
+  def precache(max = -1)
+    return if max > -1 && @file.size > max
     @file.seek 0
     @file = StringIO.new @file.read, "r"
   end
@@ -111,7 +112,6 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     chunk = nth_chunk(index, string)
     raise "No chunk for index #{index}" unless chunk
     actual_word_length = chunk.unpack("C")[0]
-    # STDERR.puts "awl = #{actual_word_length}, chunk = #{chunk[0..4].inspect}"
     if !length_range || length_range.include?(actual_word_length)
       # returns [word, frequency]
       chunk.unpack("xa#{actual_word_length}@#{@word_length}N")
@@ -177,7 +177,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     # options parsing
     rng            = options[:rng] || self.rng
-    string         = file_percentile_range_read(options[:percentile] || (0..100))
+    string         = record_percentile_range_read(options[:percentile] || (0..100))
     range_size     = string.length / @entry_length
     max_iterations = [options[:max_iterations] || 1000, count*10].max
 
@@ -206,10 +206,8 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     entry = CorrectHorseBatteryStaple::Word.new :word => ""
     while result.count < count && iterations < max_iterations
       i = rng.random_number(range_size)
-      # STDERR.puts "checking #{i} in #{length_range} strlen = #{string.length} range_size = #{range_size}"
       unless skip_cache.include? i
         pr = parse_record(string, i, entry, length_range)
-        # STDERR.puts "pr is #{pr.inspect}"
         if pr
           result << pr.dup
         else
@@ -228,21 +226,35 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     @records_size ||= (@file.size - @record_offset)
   end
 
-  # returns a string representing the record-holding portion of the file
-  def records_string
-    @records_string ||=
-      file_range_read(0 ... records_size)
+  def file_string
+    @file.is_a?(StringIO) ? @file.string : file_range_read(nil)
   end
 
-  def file_range_read(file_range)
-    @file.seek(file_range.first + @record_offset)
+  def file_range_read(file_range = nil)
+    file_range ||= 0...@file.size
+    pos = @file.tell
+    @file.seek(file_range.first)
     @file.read(file_range.count)
+  ensure
+    @file.seek(pos)
   end
   memoize :file_range_read
 
-  def file_percentile_range_read(percentile_range)
-    file_range = file_range_for_percentile(percentile_range)
-    file_range_read(file_range)
+  # returns a string representing the record-holding portion of the file
+  def records_string
+    @records_string ||=
+      record_range_read(0 ... records_size)
+  end
+
+  def record_range_read(record_range = nil)
+    record_range ||= 0...records_size
+    file_range_read((record_range.first + @record_offset)...(record_range.count + @record_offset))
+  end
+  # memoize :record_range_read
+
+  def record_percentile_range_read(percentile_range)
+    record_range = record_range_for_percentile(percentile_range)
+    record_range_read(record_range)
   end
 
 
@@ -252,7 +264,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     round ? r.round : r
   end
 
-  def file_range_for_percentile(range)
+  def record_range_for_percentile(range)
     range = Range.new(range - 0.5, range + 0.5) if range.is_a?(Numeric)
     (percentile_index(range.begin, false).floor * @entry_length ...
      percentile_index(range.end,   false).ceil * @entry_length)
