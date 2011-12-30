@@ -32,6 +32,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
   def initialize(filename, stats = nil)
     @filename = filename
+    @file = CorrectHorseBatteryStaple::Util.open_binary(filename, "r")
     parse_prelude
   end
 
@@ -235,7 +236,8 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   end
 
   def file_range_read(file_range)
-    binread(@filename, file_range.count, file_range.first + @record_offset)
+    @file.seek(file_range.first + @record_offset)
+    @file.read(file_range.count)
   end
   memoize :file_range_read
 
@@ -256,6 +258,5 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     (percentile_index(range.begin, false).floor * @entry_length ...
      percentile_index(range.end,   false).ceil * @entry_length)
   end
-
 
 end

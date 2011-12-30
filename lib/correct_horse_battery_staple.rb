@@ -65,6 +65,16 @@ module CorrectHorseBatteryStaple
     end
   end
 
+  module Util
+    def self.open_binary(filename, mode = "r", *rest)
+      open(filename, openmode(mode), *rest)
+    end
+
+    def self.openmode(mode)
+      IO.respond_to?(:binwrite) ? "#{mode}b:ASCII-8BIT" : mode
+    end
+  end
+
   autoload :Word, 'correct_horse_battery_staple/word'
   autoload :Generator, 'correct_horse_battery_staple/generator'
   autoload :Corpus, 'correct_horse_battery_staple/corpus'
