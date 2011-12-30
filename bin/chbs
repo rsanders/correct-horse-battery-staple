@@ -102,9 +102,12 @@ command :generate do |c|
     count = options.repeat.to_i
 
     corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
+    if count > 1
+      corpus.precache
+    end
     puts "loaded corpus!" if options.debug
     unfiltered_size = corpus.count
-
+    
     make_options = {}
 
     f_wordsize = CorrectHorseBatteryStaple::RangeParser.new.parse options.wordsize

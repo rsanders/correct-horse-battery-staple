@@ -36,6 +36,11 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     parse_prelude
   end
 
+  def precache
+    @file.seek 0
+    @file = StringIO.new @file.read, "r"
+  end
+
   def self.memoize(method)
     old_method = "_#{method}_unmemoized".to_sym
     miss_object = Object.new
@@ -62,7 +67,8 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   # end
 
   def parse_prelude
-    prelude_buf = binread(@filename, INITIAL_PRELUDE_LENGTH)
+    @file.seek 0
+    prelude_buf = @file.read(INITIAL_PRELUDE_LENGTH)
 
     # byte offset of first record from beginning of file
     # total length of JSON string (without padding)
@@ -70,9 +76,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     # read more if our initial read didn't slurp in the entire prelude
     if @prelude_len > prelude_buf.length
-      prelude_buf += binread(@filename,
-                             @prelude_len - prelude_buf.length,
-                             INITIAL_PRELUDE_LENGTH)
+      prelude_buf += @file.read(@prelude_len - prelude_buf.length)
     end
 
     @prelude = JSON.parse( prelude_buf.unpack("@8a#{@prelude_len}")[0] ) || {}
@@ -220,19 +224,14 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
   ## file I/O
 
-  def binread(*args)
-    method = IO.respond_to?(:binread) ? :binread : :read
-    IO.send(method, *args)
-  end
-
   def records_size
-    @records_size ||= (File.size(@filename) - @record_offset)
+    @records_size ||= (@file.size - @record_offset)
   end
 
   # returns a string representing the record-holding portion of the file
   def records_string
     @records_string ||=
-      binread(@filename, records_size, @record_offset)
+      file_range_read(0 ... records_size)
   end
 
   def file_range_read(file_range)

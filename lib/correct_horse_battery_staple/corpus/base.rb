@@ -88,6 +88,10 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     execute_filters.map {|entry| entry.word }
   end
 
+  # no-op for serialized forms
+  def precache
+  end
+
   def frequencies
     CorrectHorseBatteryStaple::StatisticalArray.new(entries.map {|entry| entry.frequency })
   end
