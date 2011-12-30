@@ -5,6 +5,6 @@ class CorrectHorseBatteryStaple::Writer::Marshal < CorrectHorseBatteryStaple::Wr
   end
 
   def write_corpus(corpus)
-    write Marshal.dump(corpus)
+    write ::Marshal.dump(corpus)
   end
 end
