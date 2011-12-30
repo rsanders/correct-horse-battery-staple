@@ -5,7 +5,7 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
   def initialize(dest, options={})
     super
   end
-
+  # select * from entries where percentile < 30 and percentile > 20 and wordlength >= 9 and wordlength <= 12  order by RANDOM() limit 6;
   def write_corpus(corpus)
     create_database
 

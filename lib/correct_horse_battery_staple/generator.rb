@@ -22,6 +22,11 @@ class CorrectHorseBatteryStaple::Generator
       join("-")
   end
 
+  def estimate_entropy(options)
+    candidate_count = @corpus.count(options)
+    bits_per = (log(candidate_count) / log(2)).floor
+  end
+
   def words
     @words ||= @corpus.result
   end
