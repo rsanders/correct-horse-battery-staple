@@ -2,12 +2,12 @@
 
 Gem::Specification.new do |s|
   s.name = "correct-horse-battery-staple"
-  s.version = "0.3.0.20111229164920"
+  s.version = "0.3.1.20111229212306"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Robert Sanders"]
   s.cert_chain = ["/Users/robertsanders/.gem/gem-public_cert.pem"]
-  s.date = "2011-12-29"
+  s.date = "2011-12-30"
   s.description = "Generate a 4 word password from words of size 3-8 characters, with\nfrequencies in the 30th-60th percentile. This range gives a nice set\nof uncommon but not completely alien words.\n\n    $ chbs generate --verbose -W 3..8 -P 30..60\n    Corpus size: 6396 candidate words of 33075 total\n    Entropy: 48 bits (2^48 = 281474976710656)\n    Years to guess at 1000 guesses/sec: 8926\n    magnate-thermal-sandbank-augur\n\nWith the --verbose flag, the utility will calculate a time-to-guess\nbased on a completely arbitrary 1000 guesses/sec.  If you'd like a\nmore secure password, either relax the various filtering rules (-W and\n-P), add more words to the password, or use a larger corpus.\n\nBy default we use the American TV Shows & Scripts corpus taken from\nWiktionary.\n\nOthers provided:\n\n* Project Gutenberg 2005 corpus taken from Wiktionary.\n* 1 of every 7 of the top 60000 lemmas from wordfrequency.info (6900\n  actual lemmas after processing)\n\nSee http://xkcd.com/936/ for the genesis of the idea.\n\nData sources:\n\n     http://en.wiktionary.org/wiki/Wiktionary:Frequency_lists\n     http://wordfrequency.info/"
   s.email = ["robert@curioussquid.com"]
   s.executables = ["chbs", "chbs-mkpass", "generate_all"]
