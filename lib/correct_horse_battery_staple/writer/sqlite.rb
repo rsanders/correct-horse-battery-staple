@@ -61,7 +61,7 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
   end
 
   def create_database
-    @db = SQLite3::Database.new dest.path
+    @db = SQLite3::Database.new path_for(dest)
 
     # Create a database
     rows = @db.execute <<-SQL
