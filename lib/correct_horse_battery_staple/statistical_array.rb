@@ -33,6 +33,16 @@ module CorrectHorseBatteryStaple
     def mean
       inject(0) { |sum, x| sum += x } / size.to_f
     end
+    alias :average :mean
+
+    def sum
+      reduce(:+)
+    end
+
+    def sort(&block)
+      return super(&block) if block || !@sorted
+      self
+    end
 
     def standard_deviation(m = mean)
       variance = inject(0) { |variance, x| variance += (x - m) ** 2 }

@@ -3,6 +3,8 @@
 #
 
 class CorrectHorseBatteryStaple::Writer::Base < CorrectHorseBatteryStaple::Writer
+  include CorrectHorseBatteryStaple::Common
+
   attr_accessor :dest, :options
 
   def initialize(dest, options = {})

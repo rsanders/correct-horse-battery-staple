@@ -8,6 +8,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   attr_accessor :weighted_size
 
   include CorrectHorseBatteryStaple::Common
+  include CorrectHorseBatteryStaple::Memoize
   include Enumerable
 
   # you MUST override this method for Enumerable to use
@@ -31,6 +32,30 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   def sorted_entries
     entries.sort
   end
+
+  # return all the candidates for a given set of options
+  def candidates(options = {})
+    return size if !options || options.empty?
+    filter = filter_for_options(options)
+    return size unless filter
+    entries.select {|entry| filter.call(entry) }
+  end
+
+  def count_candidates(options = {})
+    return size if !options || options.empty?
+    filter = filter_for_options(options)
+    return size unless filter
+
+    count = 0
+    each do |entry|
+      count += 1 if filter.call(entry)
+    end
+    count
+  end
+
+  memoize :count_candidates
+
+
 
   #
   # this is the core password picker method. it is not especially
@@ -192,6 +217,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
      (r.exclude_end? ? 0 : (r.first > r.last ? -1 : 1))
      ).abs
   end
+  alias :range_size :range_count
 
   #
   # Given a filter, return all Word objects in this Corpus that the
@@ -203,6 +229,30 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     entries.select &compose_filters(@filters)
   ensure
     reset
+  end
+
+  #
+  # Return a single lambda that will return true/false given a Word object
+  #
+  # Respects the :word_length, :percentile, and :filter options
+  # :word_length and :percentile should be Range objects
+  # :filter can be a single Proc/lambda or an array of them
+  #
+  def filter_for_options(options = {})
+    return nil if !options || options.empty?
+
+    filters = Array(options[:filter])
+    if options[:percentile]
+      p_range = options[:percentile]
+      filters << lambda {|entry| p_range.include? entry.percentile }
+    end
+
+    if options[:word_length]
+      wl_range = options[:word_length]
+      filters << lambda {|entry| wl_range.include? entry.word.length }
+    end
+
+    filters.empty? ? nil : compose_filters(filters)
   end
 
 end

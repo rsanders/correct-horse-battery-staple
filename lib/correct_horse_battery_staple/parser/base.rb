@@ -1,4 +1,5 @@
 class CorrectHorseBatteryStaple::Parser
-  class Base
+  class Base << CorrectHorseBatteryStaple::Parser
+    include CorrectHorseBatteryStaple::Common
   end
 end

@@ -75,13 +75,14 @@ module CorrectHorseBatteryStaple
     end
   end
 
-  autoload :Word, 'correct_horse_battery_staple/word'
-  autoload :Generator, 'correct_horse_battery_staple/generator'
-  autoload :Corpus, 'correct_horse_battery_staple/corpus'
-  autoload :Parser, 'correct_horse_battery_staple/parser'
-  autoload :StatisticalArray, 'correct_horse_battery_staple/statistical_array'
-  autoload :RangeParser, 'correct_horse_battery_staple/range_parser'
-  autoload :Writer, 'correct_horse_battery_staple/writer'
+  autoload :Word,               'correct_horse_battery_staple/word'
+  autoload :Generator,          'correct_horse_battery_staple/generator'
+  autoload :Corpus,             'correct_horse_battery_staple/corpus'
+  autoload :Parser,             'correct_horse_battery_staple/parser'
+  autoload :StatisticalArray,   'correct_horse_battery_staple/statistical_array'
+  autoload :RangeParser,        'correct_horse_battery_staple/range_parser'
+  autoload :Writer,             'correct_horse_battery_staple/writer'
+  autoload :Memoize,            'correct_horse_battery_staple/memoize'
 end
 
 
