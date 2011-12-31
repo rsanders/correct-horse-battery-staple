@@ -64,9 +64,16 @@ module CorrectHorseBatteryStaple
       CorrectHorseBatteryStaple.logger
     end
 
-    def random_number(max=1.0)
-      Random.rand(max)
+    if Object.const_defined?("Random")
+      def random_number(max=1.0)
+        Random.rand(max)
+      end
+    else
+      def random_number(max=1.0)
+        SecureRandom.random_number(max)
+      end
     end
+
     def random_in_range(range)
       range.first + random_number(range_count(range))
     end
