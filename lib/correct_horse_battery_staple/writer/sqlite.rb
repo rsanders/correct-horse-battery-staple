@@ -5,28 +5,55 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
   def initialize(dest, options={})
     super
   end
+
   # select * from entries where percentile < 30 and percentile > 20 and wordlength >= 9 and wordlength <= 12  order by RANDOM() limit 6;
   def write_corpus(corpus)
     create_database
 
-    statement = @db.prepare("insert into entries (word, wordlength, frequency, idx, rank, percentile) values (?, ?, ?, ?, ?, ?)")
-    size = corpus.size
-    corpus.each_with_index do |w, index|
-      res = statement.execute(w.word, w.word.length, w.frequency.to_i, index+1,
-                              size-index, [0, w.percentile].max)
+    @db.transaction do
+      save_entries(@db, corpus)
+      save_stats(@db, corpus.stats)
     end
 
-    corpus.stats.each do |key, value| 
-      @db.execute "insert into stats (name, value) values (?, ?)", key.to_s, value
-    end
   rescue
-    STDERR.puts "error in write_corpus: #{$!.inspect}"
+    logger.error "error in SQLite write_corpus: #{$!.inspect}"
+    raise
   ensure
-    statement.close
     close_database
   end
 
   protected
+
+  def save_entries(db, corpus)
+    statement = db.prepare("insert into entries " +
+                           "(word, wordlength, frequency, idx, rank, percentile, randunit) " +
+                           "values (?, ?, ?, ?, ?, ?, ?)")
+    rstmt = db.prepare("insert into index3d (id, minP, maxP, minL, maxL, minR, maxR) " +
+                       "values (?, ?, ?, ?, ?, ?, ?)")
+
+    size = corpus.size
+    corpus.each_with_index do |w, index|
+      percentile = [0, w.percentile].max.round
+      rndnum = SecureRandom.random_number
+      res = statement.execute(w.word, w.word.length, w.frequency.to_i,
+                              index+1, size-index, percentile,
+                              rndnum)
+      row_id = @db.last_insert_row_id
+      rstmt.execute(row_id,
+                    percentile, percentile,
+                    w.word.length, w.word.length,
+                    rndnum, rndnum)
+    end
+  ensure
+    statement.close rescue nil
+    rstmt.close rescue nil
+  end
+
+  def save_stats(db, stats)
+    stats.each do |key, value|
+      @db.execute "insert into stats (name, value) values (?, ?)", key.to_s, value
+    end
+  end
 
   def create_database
     @db = SQLite3::Database.new dest.path
@@ -34,18 +61,31 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
     # Create a database
     rows = @db.execute <<-SQL
       create table entries (
-        word varchar(30),
-        wordlength int,
-        frequency int,
-        idx int,
-        rank int,
-        percentile double
+        id integer primary key,
+        word varchar(32),
+        wordlength integer,
+        frequency integer,
+        idx integer,
+        rank integer,
+        percentile integer,
+        randunit double
       );
      SQL
 
+    @db.execute <<-VTSQL
+        CREATE VIRTUAL TABLE index3d USING rtree(
+           id,              -- Integer primary key
+           minP, maxP,      -- Minimum and maximum percentile
+           minL, maxL,      -- Minimum and maximum percentile
+           minR, maxR       -- Min/max Randomly assigned #
+        );
+     VTSQL
+
     ['create index freqidx on entries (frequency, wordlength)',
      'create index percentileidx on entries (percentile, wordlength)',
-     'create index wordidx on entries (word)'].each do |stmt|
+     'create index wordidx on entries (word)',
+     'create index randidx on entries (randunit, percentile)'
+    ].each do |stmt|
       @db.execute stmt
     end
 
