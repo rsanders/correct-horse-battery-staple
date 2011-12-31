@@ -27,7 +27,17 @@ namespace :chbs do
     sh "./script/generate_all"
   end
   task :corpus => "corpus/tvscripts.json"
+
+  task :clean do
+    sh "rm -f corpus/*"
+  end
 end
 
-task :spec => "chbs:corpus"
+task :corpus => "chbs:corpus"
+
+["gem", "spec", "install_gem"].each do |task|
+  Rake::Task[task].prerequisites.unshift "chbs:corpus"
+end
+task :clean => "chbs:clean"
+
 # -*- mode: Ruby -*-
