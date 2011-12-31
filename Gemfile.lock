@@ -41,6 +41,7 @@ GEM
       method_source (~> 0.6.5)
       ruby_parser (~> 2.0.5)
       slop (~> 2.1.0)
+      spoon (~> 0.0.1)
     pry (0.9.6.2-java)
       coderay (~> 0.9.8)
       method_source (~> 0.6.5)
@@ -59,6 +60,7 @@ GEM
     rspec-expectations (2.5.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.5.0)
+    ruby-prof (0.10.8)
     ruby_parser (2.0.6)
       sexp_processor (~> 3.0)
     rubyforge (2.0.4)
@@ -99,6 +101,7 @@ DEPENDENCIES
   rdoc
   redis
   rspec
+  ruby-prof
   rubyforge
   sqlite3
   tddium

@@ -36,6 +36,8 @@ group :development do
   gem "hoe-gemspec"
   gem "hoe-debugging"
 
+  gem "ruby-prof"
+
   # CI
   gem "tddium"
 end
