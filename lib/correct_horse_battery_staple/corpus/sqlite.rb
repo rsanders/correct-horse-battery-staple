@@ -52,13 +52,19 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
   end
 
   def pick_rtree(count, options = {})
-    statement = "select id from index3d "
+    base = "select id from index3d "
     wheres = []
     params = []
 
     wheres << "minR >= ? and maxR <= ?"
     rnd = random_number
-    params += [rnd - 0.20, rnd + 0.20]
+    offset = 0.0
+    if rnd > 0.8
+      offset = 0.8-rnd
+    elsif rnd < 0.2
+      offset = 0.2-rnd
+    end
+    params += [rnd - 0.20 + offset, rnd + 0.20 + offset]
 
     if options[:word_length]
       wheres << "  minL >= ? and maxL <= ? "
@@ -68,14 +74,13 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
       wheres << "  minP >= ? and maxP <= ? "
       params += [options[:percentile].first, options[:percentile].last]
     end
-    statement = [statement,
+    statement = [base,
                  (wheres.empty? ? "" : " WHERE " + wheres.join(" AND ")),
-                 "order by (minR - #{rand})",
-                 "limit #{count}"].join(" ")
+                 "limit ?"].join(" ")
+    params += [[count,250].max]
 
     query = prepare(statement)
-    
-    ids = query.execute!(statement, *params).map {|r| r[0]}
+    ids = query.execute!(*params).shuffle[0...count].map {|r| r[0]}
 
     if ids and !ids.empty?
       rows = @db.execute("select #{COLUMNS.join(", ")} from entries where id IN (#{ids.join(",")}) ")
@@ -104,11 +109,13 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     end
     statement = [statement,
                  (wheres.empty? ? "" : " WHERE " + wheres.join(" AND ")),
-                 "order by RANDOM()",
-                 "limit #{count}"].join(" ")
-
-    rows = @db.execute(statement, *params)
-    result = rows.map { |row| word_from_row(row) }
+                 # "order by RANDOM()",
+                 "limit ?"].join(" ")
+    params << [count, 250].max
+    query = prepare(statement)
+    result = query.execute!(*params).
+      shuffle[0...count].
+      map { |row| word_from_row(row) }
 
     # validate that we succeeded
     raise "Cannot find #{count} words matching criteria" if result.length < count
@@ -116,6 +123,35 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     result
   end
 
+  def pick_standard2(count, options = {})
+    statement = "select id from entries "
+    params = []
+    wheres = []
+    if options[:word_length]
+      wheres << "  wordlength >= ? and wordlength <= ? "
+      params += [options[:word_length].first, options[:word_length].last]
+    end
+    if options[:percentile]
+      wheres << "  percentile >= ? and percentile <= ? "
+      params += [options[:percentile].first, options[:percentile].last]
+    end
+    statement = [statement,
+                 (wheres.empty? ? "" : " WHERE " + wheres.join(" AND ")),
+                 # "order by RANDOM()",
+                 "limit ?"].join(" ")
+    params << [count, 250].max
+    query = prepare(statement)
+    ids = query.execute!(*params).
+      shuffle[0...count].map {|r| r[0]}
+
+    statement = "select #{COLUMNS.join(", ")} from entries where ID in (#{ids.join(',')})"
+    result = @db.execute(statement).map { |row| word_from_row(row) }
+
+    # validate that we succeeded
+    raise "Cannot find #{count} words matching criteria" if result.length < count
+
+    result
+  end
 
 
   # discrete method
@@ -136,7 +172,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     # validate that we succeeded
     raise "Cannot find #{count} words matching criteria" if result.length < count
 
-    result.shuffle[0..count].map {|row| word_from_row(row)}
+    result.shuffle[0...count].map {|row| word_from_row(row)}
   end
 
   def prepare(statement)

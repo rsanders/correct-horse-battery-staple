@@ -36,6 +36,16 @@ end
 puts "\n*** Generating 100,000 words ***"
 Benchmark.bmbm do |b|
   @formats.each do |format|
-    b.report("#{format}") { generate_many(format) }
+    if format == "sqlite"
+      ["standard", "standard2", "rtree", "discrete"].each do |strategy|
+        b.report("#{format} (#{strategy})") do
+          ENV['pick_strategy'] = strategy
+          generate_many(format)
+        end
+      end
+      ENV.delete('pick_strategy')
+    else
+      b.report("#{format}") { generate_many(format) }
+    end
   end
 end
