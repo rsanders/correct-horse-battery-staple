@@ -80,7 +80,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     params += [[count,250].max]
 
     query = prepare(statement)
-    ids = query.execute!(*params).shuffle[0...count].map {|r| r[0]}
+    ids = array_sample(query.execute!(*params), count).map {|r| r[0]}
 
     if ids and !ids.empty?
       result = get_words_for_ids(ids)
@@ -124,8 +124,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
                  "limit ?"].join(" ")
     params << [count, 250].max
     query = prepare(statement)
-    result = query.execute!(*params).
-      shuffle[0...count].
+    result = array_sample(query.execute!(*params), count).
       map { |row| word_from_row(row) }
 
     # validate that we succeeded
@@ -152,8 +151,8 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
                  "limit ?"].join(" ")
     params << [count, 250].max
     query = prepare(statement)
-    ids = query.execute!(*params).
-      shuffle[0...count].map {|r| r[0]}
+    ids = array_sample(query.execute!(*params), count).
+      map {|r| r[0]}
 
     result = get_words_for_ids(ids)
 
@@ -182,7 +181,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     # validate that we succeeded
     raise "Cannot find #{count} words matching criteria" if result.length < count
 
-    result.shuffle[0...count].map {|row| word_from_row(row)}
+    array_sample(result, count).map {|row| word_from_row(row)}
   end
 
   def prepare(statement)
@@ -215,7 +214,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
       iterations += 1
     end
 
-    ids = ids.shuffle[0...count].map {|r| r[0] }
+    ids = array_sample(ids, count).map {|r| r[0] }
     result = get_words_for_ids(ids)
 
     # validate that we succeeded

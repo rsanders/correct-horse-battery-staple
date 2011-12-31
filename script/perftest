@@ -34,7 +34,7 @@ Benchmark.bmbm do |b|
 end
 
 puts "\n*** Generating 100,000 words ***"
-Benchmark.bmbm do |b|
+Benchmark.bm(18) do |b|
   @formats.each do |format|
     if format == "sqlite"
       ["standard", "standard2", "rtree", "discrete", "discrete2"].each do |strategy|

@@ -70,6 +70,11 @@ module CorrectHorseBatteryStaple
     def random_in_range(range)
       range.first + random_number(range_count(range))
     end
+
+    def array_sample(array, count)
+      l = array.length
+      array.values_at(* count.times.map { random_number(l) })
+    end
   end
 
   module Util
