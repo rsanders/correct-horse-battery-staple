@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'correct_horse_battery_staple'
+require 'benchmark'
+
+@generators = {}
+@corpuses = {}
+@formats = %w[isam marshal json sqlite]
+
+def load_corpus(format, corpus = "tvscripts")
+  corpus = CorrectHorseBatteryStaple.load_corpus(corpus, format)
+  @corpuses[format] = corpus
+  @generators[format] = CorrectHorseBatteryStaple::Generator.new(corpus)
+end
+
+def generate_many(format, count = 100_000, corpus = "tvscripts")
+  generator = @generators[format]
+  word_length = 3..9
+  percentile = 30..80
+  number_of_words = 4
+
+  count.times do
+    generator.make(number_of_words,
+                   :word_length => word_length,
+                   :percentile => percentile)
+  end
+end
+
+puts "*** Loading Corpus ***"
+Benchmark.bmbm do |b|
+  @formats.each do |format|
+    b.report("#{format}") { load_corpus(format) }
+  end
+end
+
+puts "\n*** Generating 100,000 words ***"
+Benchmark.bmbm do |b|
+  @formats.each do |format|
+    b.report("#{format}") { generate_many(format) }
+  end
+end

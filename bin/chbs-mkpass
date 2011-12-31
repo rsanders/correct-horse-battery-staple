@@ -2,7 +2,8 @@
 
 require 'correct_horse_battery_staple'
 
-corpus = CorrectHorseBatteryStaple.load_corpus(ARGV[0] || "tvscripts", "isam")
+format = ARGV[2] || ENV['corpus_format'] || "isam"
+corpus = CorrectHorseBatteryStaple.load_corpus(ARGV[0] || "tvscripts", format)
 
 word_length = 3..9
 percentile = 30..80
