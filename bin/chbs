@@ -58,10 +58,12 @@ command :convert do |c|
       corpus.table.slice!(options.limit..-1) if corpus.size > options.limit
     end
 
-    # corpus.write(outfile, options.oformat)
-    writer = CorrectHorseBatteryStaple::Writer.make_writer(outfile, options.oformat)
-    writer.write_corpus(corpus)
-    writer.close
+    with_tempfile(outfile) do |tempfile|
+      writer = CorrectHorseBatteryStaple::Writer.make_writer(tempfile, options.oformat)
+      writer.write_corpus(corpus)
+      writer.close
+    end
+
   end
 end
 
@@ -180,7 +182,21 @@ command :mkcorpus do |c|
 
     options.oformat ||= CorrectHorseBatteryStaple::Corpus.format_for(destination)
 
-    CorrectHorseBatteryStaple::Writer.write(corpus, destination, options.oformat)
+    with_tempfile(destination) do |tempname|
+      CorrectHorseBatteryStaple::Writer.write(corpus, tempname, options.oformat)
+    end
   end
 end
 
+def with_tempfile(realname)
+  if realname.is_a?(String) or realname.is_a?(File) && File.exist?(realname.path)
+    realpath = realname.respond_to?(:path) ? realname.path : realname
+    tempname = ".temp#{Process.pid}-#{realpath}"
+    yield tempname
+    File.rename tempname, realpath
+  else
+    yield realname
+  end
+rescue
+  File.delete(tempname) if File.exist?(tempname)
+end
