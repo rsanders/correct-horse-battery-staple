@@ -191,7 +191,7 @@ end
 def with_tempfile(realname)
   if realname.is_a?(String) or realname.is_a?(File) && File.exist?(realname.path)
     realpath = realname.respond_to?(:path) ? realname.path : realname
-    tempname = ".temp#{Process.pid}-#{realpath}"
+    tempname = File.join(File.dirname(realpath), ".temp-#{File.basename(realpath)}")
     yield tempname
     File.rename tempname, realpath
   else
