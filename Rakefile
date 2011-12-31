@@ -20,5 +20,14 @@ Hoe.spec 'correct-horse-battery-staple' do
   dependency 'json', '>= 1.6.0'
 end
 
-# vim: syntax=ruby
+namespace :chbs do
+  task :generate_corpus => "corpus/tvscripts.json"
+
+  file "corpus/tvscripts.json" do |task|
+    sh "./script/generate_all"
+  end
+  task :corpus => "corpus/tvscripts.json"
+end
+
+task :spec => "chbs:corpus"
 # -*- mode: Ruby -*-
