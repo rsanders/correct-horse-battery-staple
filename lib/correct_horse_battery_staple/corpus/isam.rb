@@ -37,9 +37,13 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   end
 
   def precache(max = -1)
-    return if max > -1 && @file.size > max
+    return if max > -1 && file_size(@file) > max
     @file.seek 0
     @file = StringIO.new @file.read, "r"
+  end
+
+  def file_size(file)
+    (file.respond_to?(:size) ? file.size : file.stat.size)
   end
 
   def self.memoize(method)
@@ -189,7 +193,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     result         = _pick(string, count, options[:word_length], max_iterations)
 
     # validate that we succeeded
-    raise "Cannot find #{count} words matching criteria" if result.count < count
+    raise "Cannot find #{count} words matching criteria" if result.length < count
 
     result
   end
@@ -204,7 +208,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
     # don't cons!
     entry = CorrectHorseBatteryStaple::Word.new :word => ""
-    while result.count < count && iterations < max_iterations
+    while result.length < count && iterations < max_iterations
       i = rng.random_number(range_size)
       unless skip_cache.include? i
         pr = parse_record(string, i, entry, length_range)
@@ -223,7 +227,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   ## file I/O
 
   def records_size
-    @records_size ||= (@file.size - @record_offset)
+    @records_size ||= (file_size(@file) - @record_offset)
   end
 
   def file_string
@@ -231,10 +235,10 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   end
 
   def file_range_read(file_range = nil)
-    file_range ||= 0...@file.size
+    file_range ||= 0...file_size(@file)
     pos = @file.tell
     @file.seek(file_range.first)
-    @file.read(file_range.count)
+    @file.read(range_count(file_range))
   ensure
     @file.seek(pos)
   end
@@ -248,7 +252,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
   def record_range_read(record_range = nil)
     record_range ||= 0...records_size
-    file_range_read((record_range.first + @record_offset)...(record_range.count + @record_offset))
+    file_range_read((record_range.first + @record_offset)...(range_count(record_range) + @record_offset))
   end
   # memoize :record_range_read
 

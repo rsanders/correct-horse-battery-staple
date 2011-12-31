@@ -48,7 +48,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     else
       range = 0..array.size-1
     end
-    range_size = range.count
+    range_size = range_size(range)
 
     if range_size < count
       raise ArgumentError, "Percentile range contains fewer words than requested count"
@@ -65,7 +65,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
     result = []
     iterations = 0
-    while result.count < count && iterations < max_iterations
+    while result.length < count && iterations < max_iterations
       i = rng.random_number(range_size)
       entry = array[i + range.first]
       if entry && (!filter || filter.call(entry))
@@ -74,7 +74,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
       iterations += 1
     end
 
-    raise "Cannot find #{count} words matching criteria" if result.count < count
+    raise "Cannot find #{count} words matching criteria" if result.length < count
     result
   end
 
@@ -138,7 +138,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   end
 
   def recalculate
-    size        = self.count
+    size        = self.size
     frequencies = self.frequencies
 
     # corpus-wide statistics
@@ -151,7 +151,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     (self.frequency_mean, self.frequency_stddev) = frequencies.mean_and_standard_deviation
 
       # stats              = corpus.stats
-      # size               = corpus.count
+      # size               = corpus.size
       # frequency_mean     = corpus.frequency_mean
       # frequency_stddev   = corpus.frequency_stddev
       # weighted_size      = corpus.weighted_size
@@ -181,6 +181,22 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
   protected
 
+  #
+  # Return the number of distinct objects within the Range.
+  # This assumes plain vanilla ranges, though it does respect .. vs ...
+  #
+  # Why? Range#count is basically #to_a.count, which is INSANE
+  #
+  def range_count(r)
+    (r.last - r.first +
+     (r.exclude_end? ? 0 : (r.first > r.last ? -1 : 1))
+     ).abs
+  end
+
+  #
+  # Given a filter, return all Word objects in this Corpus that the
+  # filter accepts.
+  #
   # this is an exceptionally inefficient version
   def execute_filters
     return entries if @filters.nil? || @filters.empty?
