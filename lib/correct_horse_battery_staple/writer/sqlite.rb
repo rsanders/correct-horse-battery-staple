@@ -87,7 +87,7 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
      VTSQL
 
     ['create index freqidx on entries (frequency, wordlength)',
-     'create index percentileidx on entries (percentile, wordlength)',
+     'create index percentileidx on entries (percentile, wordlength, randunit)',
      'create index wordidx on entries (word)',
      'create index randidx on entries (randunit, percentile)'
     ].each do |stmt|

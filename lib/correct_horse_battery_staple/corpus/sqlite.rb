@@ -83,8 +83,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     ids = query.execute!(*params).shuffle[0...count].map {|r| r[0]}
 
     if ids and !ids.empty?
-      rows = @db.execute("select #{COLUMNS.join(", ")} from entries where id IN (#{ids.join(",")}) ")
-      result = rows.map { |row| word_from_row(row) }
+      result = get_words_for_ids(ids)
     else
       result = []
     end
@@ -94,6 +93,18 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
     result
   end
+
+  def get_words_for_ids(ids)
+    ids = Array(ids)
+    rows = @db.execute("select #{COLUMNS.join(", ")} from entries where id in (#{ids.join(',')})")
+
+    words = []
+    ids.each do |id|
+      words << rows.find {|r| r[0] == id }
+    end
+    words.map {|row| word_from_row(row)}
+  end
+
 
   def pick_standard(count, options = {})
     statement = "select #{COLUMNS.join(", ")} from entries "
@@ -144,8 +155,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     ids = query.execute!(*params).
       shuffle[0...count].map {|r| r[0]}
 
-    statement = "select #{COLUMNS.join(", ")} from entries where ID in (#{ids.join(',')})"
-    result = @db.execute(statement).map { |row| word_from_row(row) }
+    result = get_words_for_ids(ids)
 
     # validate that we succeeded
     raise "Cannot find #{count} words matching criteria" if result.length < count
@@ -162,7 +172,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
     result = []
     iterations = 0
-    while (iterations < count || result.length < count) && iterations < MAX_ITERATIONS
+    while (iterations < 4 || result.length < count) && iterations < MAX_ITERATIONS
       percentile  = random_in_range(p_range)
       length      = random_in_range(l_range)
       result     += _pick_discrete_n(percentile, length, 1)
@@ -189,14 +199,54 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     statement.execute!(percentile, length, random_number, count)
   end
 
+
+  # discrete method
+  def pick_discrete2(count, options = {})
+
+    p_range = options[:percentile] or 0..100
+    l_range = options[:word_length] or 4..12
+
+    ids = []
+    iterations = 0
+    while (iterations < 3 || ids.length < count) && iterations < MAX_ITERATIONS
+      percentile  = random_in_range(p_range)
+      length      = random_in_range(l_range)
+      ids         = ids.concat(_pick_discrete_n_ids(percentile, length, 50)).uniq
+      iterations += 1
+    end
+
+    ids = ids.shuffle[0...count].map {|r| r[0] }
+    result = get_words_for_ids(ids)
+
+    # validate that we succeeded
+    raise "Cannot find #{count} words matching criteria" if result.length < count
+    result
+  end
+
+  def prepare(statement)
+    res = @db.prepare(statement)
+    @statements << res
+    res
+  end
+  memoize :prepare
+
+  def _pick_discrete_n_ids(percentile, length, count = 1)
+    statement = prepare "select id from entries where " +
+      " percentile = ? and wordlength = ? and randunit < ? limit ?"
+
+    statement.execute!(percentile, length, random_number, count)
+  end
+
+
+
   def close
     @statements.each { |x| x.close }
     super
   end
-  
+
   protected
 
-  COLUMNS = %w[word frequency idx rank percentile]
+  COLUMNS = %w[id word frequency idx rank percentile]
 
   def table
     @db.execute("select #{COLUMNS.join(", ")} from entries order by frequency").map do |row|
@@ -205,8 +255,9 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
   end
 
   def word_from_row(row)
-    CorrectHorseBatteryStaple::Word.new(:word => row[0], :frequency => row[1],
-                                        :index => row[2], :rank => row[3], :percentile => row[4])
+    CorrectHorseBatteryStaple::Word.new(:word => row[1], :frequency => row[2],
+                                        :index => row[3], :rank => row[4],
+                                        :percentile => row[5])
   end
 
   def load_stats
