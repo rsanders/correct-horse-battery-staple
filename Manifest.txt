@@ -24,7 +24,9 @@ lib/correct_horse_battery_staple/corpus.rb
 lib/correct_horse_battery_staple/corpus/base.rb
 lib/correct_horse_battery_staple/corpus/isam.rb
 lib/correct_horse_battery_staple/corpus/serialized.rb
+lib/correct_horse_battery_staple/corpus/sqlite.rb
 lib/correct_horse_battery_staple/generator.rb
+lib/correct_horse_battery_staple/memoize.rb
 lib/correct_horse_battery_staple/parser.rb
 lib/correct_horse_battery_staple/parser/base.rb
 lib/correct_horse_battery_staple/parser/regex.rb
@@ -38,6 +40,7 @@ lib/correct_horse_battery_staple/writer/file.rb
 lib/correct_horse_battery_staple/writer/isam.rb
 lib/correct_horse_battery_staple/writer/json.rb
 lib/correct_horse_battery_staple/writer/marshal.rb
+lib/correct_horse_battery_staple/writer/sqlite.rb
 script/generate_all
 spec/corpus/serialized_spec.rb
 spec/corpus_spec.rb
