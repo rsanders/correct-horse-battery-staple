@@ -8,8 +8,8 @@ gem "json"
 gem "memoizable"
 
 # external DBs
-gem "sqlite3"
-gem "redis"
+gem "sqlite3", :platforms => [:mri]
+# gem "redis"
 
 # cmdline
 gem "commander"
@@ -36,7 +36,7 @@ group :development do
   gem "hoe-gemspec"
   gem "hoe-debugging"
 
-  gem "ruby-prof"
+  gem "ruby-prof", :platforms => [:mri]
 
   # CI
   gem "tddium"
