@@ -52,7 +52,6 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     end
     count
   end
-
   memoize :count_candidates
 
 
@@ -115,6 +114,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   def frequencies
     CorrectHorseBatteryStaple::StatisticalArray.new(entries.map {|entry| entry.frequency })
   end
+  memoize :frequencies
 
   def entropy_per_word
     Math.log(count) / Math.log(2)
@@ -249,6 +249,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
     filters.empty? ? nil : compose_filters(filters)
   end
+  memoize :filter_for_options
 
 end
 
