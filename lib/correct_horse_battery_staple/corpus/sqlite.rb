@@ -6,6 +6,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
   def initialize(file)
     @db = SQLite3::Database.open file
+    @statements = []
     load_stats
   end
 
@@ -56,8 +57,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     params = []
 
     wheres << "minR >= ? and maxR <= ?"
-    rnd = SecureRandom.random_number
-    # params += [SecureRandom.random_number, SecureRandom.random_number].sort
+    rnd = random_number
     params += [rnd - 0.20, rnd + 0.20]
 
     if options[:word_length]
@@ -73,7 +73,9 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
                  "order by (minR - #{rand})",
                  "limit #{count}"].join(" ")
 
-    ids = @db.execute(statement, *params).map {|r| r[0]}
+    query = prepare(statement)
+    
+    ids = query.execute!(statement, *params).map {|r| r[0]}
 
     if ids and !ids.empty?
       rows = @db.execute("select #{COLUMNS.join(", ")} from entries where id IN (#{ids.join(",")}) ")
@@ -116,10 +118,6 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
 
 
-  def random_in_range(range)
-    range.first + SecureRandom.random_number(range_count(range))
-  end
-
   # discrete method
   def pick_discrete(count, options = {})
 
@@ -141,13 +139,25 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     result.shuffle[0..count].map {|row| word_from_row(row)}
   end
 
-  def _pick_discrete_n(percentile, length, count = 1)
-    statement = "select #{COLUMNS.join(", ")} from entries where " +
-      " percentile = ? and wordlength = ? and randunit < ? limit #{count}"
+  def prepare(statement)
+    res = @db.prepare(statement)
+    @statements << res
+    res
+  end
+  memoize :prepare
 
-    @db.execute(statement, percentile, length, SecureRandom.random_number)
+  def _pick_discrete_n(percentile, length, count = 1)
+    statement = prepare "select #{COLUMNS.join(", ")} from entries where " +
+      " percentile = ? and wordlength = ? and randunit < ? limit ?"
+
+    statement.execute!(percentile, length, random_number, count)
   end
 
+  def close
+    @statements.each { |x| x.close }
+    super
+  end
+  
   protected
 
   COLUMNS = %w[word frequency idx rank percentile]

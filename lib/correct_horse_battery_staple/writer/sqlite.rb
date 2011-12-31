@@ -1,4 +1,5 @@
 require 'sqlite3'
+require 'securerandom'
 
 class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Writer::Base
 
@@ -34,7 +35,7 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
     size = corpus.size
     corpus.each_with_index do |w, index|
       percentile = [0, w.percentile].max.round
-      rndnum = SecureRandom.random_number
+      rndnum = Random.rand
       res = statement.execute(w.word, w.word.length, w.frequency.to_i,
                               index+1, size-index, percentile,
                               rndnum)
@@ -53,6 +54,10 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
     stats.each do |key, value|
       @db.execute "insert into stats (name, value) values (?, ?)", key.to_s, value
     end
+  end
+
+  def path_for(dest)
+    dest.respond_to?(:path) ? dest.path : dest
   end
 
   def create_database
@@ -98,9 +103,13 @@ class CorrectHorseBatteryStaple::Writer::Sqlite < CorrectHorseBatteryStaple::Wri
   end
 
   def close_database
-    @db.execute 'vacuum'
-    @db.execute 'analyze'
-    @db.close
+    if @db
+      @db.execute 'vacuum'
+      @db.execute 'analyze'
+      @db.close
+    end
   end
 
 end
+
+Random.srand(SecureRandom.random_number)

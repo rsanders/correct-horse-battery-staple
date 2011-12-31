@@ -63,6 +63,13 @@ module CorrectHorseBatteryStaple
     def logger
       CorrectHorseBatteryStaple.logger
     end
+
+    def random_number(max=1.0)
+      Random.rand(max)
+    end
+    def random_in_range(range)
+      range.first + random_number(range_count(range))
+    end
   end
 
   module Util

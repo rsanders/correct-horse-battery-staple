@@ -1,5 +1,5 @@
 require 'bigdecimal'
-require 'securerandom'
+# require 'securerandom'
 
 class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpus
   attr_accessor :frequency_mean, :frequency_stddev
@@ -64,7 +64,6 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   #
   def pick(count, options = {})
     array = CorrectHorseBatteryStaple::StatisticalArray.new(sorted_entries)
-    rng = options[:rng] || self.rng
 
     filters = Array(options[:filter])
 
@@ -91,7 +90,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
     result = []
     iterations = 0
     while result.length < count && iterations < max_iterations
-      i = rng.random_number(range_size)
+      i = random_number(range_size)
       entry = array[i + range.first]
       if entry && (!filter || filter.call(entry))
         result << entry
@@ -105,10 +104,6 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
 
 
-  def rng
-    @rng ||= SecureRandom
-  end
-
   def words
     execute_filters.map {|entry| entry.word }
   end
@@ -256,3 +251,5 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   end
 
 end
+
+# Random.srand(SecureRandom.random_number)

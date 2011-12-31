@@ -165,7 +165,6 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     raise NotImplementedError, "ISAM does not support :filter option" if options[:filter]
 
     # options parsing
-    rng            = options[:rng] || self.rng
     string         = record_percentile_range_read(options[:percentile] || (0..100))
     range_size     = string.length / @entry_length
     max_iterations = [options[:max_iterations] || 1000, count*10].max
@@ -194,7 +193,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     # don't cons!
     entry = CorrectHorseBatteryStaple::Word.new :word => ""
     while result.length < count && iterations < max_iterations
-      i = rng.random_number(range_size)
+      i = random_number(range_size)
       unless skip_cache.include? i
         pr = parse_record(string, i, entry, length_range)
         if pr
