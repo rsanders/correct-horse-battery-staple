@@ -211,7 +211,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     while (iterations < 3 || ids.length < count) && iterations < MAX_ITERATIONS
       percentile  = random_in_range(p_range)
       length      = random_in_range(l_range)
-      ids         = ids.concat(_pick_discrete_n_ids(percentile, length, 50)).uniq
+      ids         = ids.concat(_pick_discrete_n_ids(percentile, length, 25)).uniq
       iterations += 1
     end
 
@@ -232,7 +232,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
   def _pick_discrete_n_ids(percentile, length, count = 1)
     statement = prepare "select id from entries where " +
-      " percentile = ? and wordlength = ? and randunit < ? limit ?"
+      " percentile = ? and wordlength = ? and randunit > ? limit ?"
 
     statement.execute!(percentile, length, random_number, count)
   end
