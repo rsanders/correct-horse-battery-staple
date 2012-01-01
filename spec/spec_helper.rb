@@ -1,3 +1,4 @@
+return if defined?(FIXTURES_DIR)
 
 GEM_DIR = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 LIB_DIR = File.join(GEM_DIR, "lib")
