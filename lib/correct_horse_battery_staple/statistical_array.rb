@@ -45,7 +45,7 @@ module CorrectHorseBatteryStaple
     end
 
     def standard_deviation(m = mean)
-      variance = inject(0) { |variance, x| variance += (x - m) ** 2 }
+      variance = inject(0) { |v, x| v += (x - m) ** 2 }
       return Math.sqrt(variance/(size-1))
     end
 

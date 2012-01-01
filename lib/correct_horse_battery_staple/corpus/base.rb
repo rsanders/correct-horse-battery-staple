@@ -221,7 +221,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   # this is an exceptionally inefficient version
   def execute_filters
     return entries if @filters.nil? || @filters.empty?
-    entries.select &compose_filters(@filters)
+    entries.select(&compose_filters(@filters))
   ensure
     reset
   end
