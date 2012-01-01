@@ -27,21 +27,26 @@ module CorrectHorseBatteryStaple::Backend::Redis
       @db.zadd(@frequency_key, w.frequency, w.word)
     end
 
+    def load_stats
+      load_stats_from_hash Hash[db.hgetall(@stats_key).map {|k,v| [k, v.to_f]}]
+    end
+
     def save_stats(stats)
-      # stats.each do |key, value|
-      #   @db.execute "insert into stats (name, value) values (?, ?)", key.to_s, value
-      # end
+      db.hmset @stats_key, *stats.to_a.flatten
     end
 
     def create_database
-      db.del @length_key, @percentile_key, @frequency_key
+      db.del @length_key, @percentile_key, @frequency_key, @stats_key
     end
 
     def open_database
-      @length_key            = make_key("length_zset")
-      @percentile_key        = make_key("percentile_zset")
-      @freqency_key          = make_key("frequency_zset")
-      @db = ::Redis.new(:host => options[:host], :port => options[:port])
+      @db ||= begin
+                @length_key            = make_key("length_zset")
+                @percentile_key        = make_key("percentile_zset")
+                @freqency_key          = make_key("frequency_zset")
+                @stats_key             = make_key("stats_hash")
+                ::Redis.new(:host => options[:host], :port => options[:port])
+              end
     end
 
     def db

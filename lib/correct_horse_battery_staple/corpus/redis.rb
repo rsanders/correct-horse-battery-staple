@@ -96,14 +96,4 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     CorrectHorseBatteryStaple::Word.new(hash)
   end
 
-  def word_from_row(row)
-    CorrectHorseBatteryStaple::Word.new(:word => row[1], :frequency => row[2],
-                                        :index => row[3], :rank => row[4],
-                                        :percentile => row[5])
-  end
-
-  def load_stats
-    #rows = @db.execute "select name, value from stats"
-    #load_stats_from_hash(rows.reduce({}) {|m, (key, val)| m.merge(key => val.to_f)})
-  end
 end
