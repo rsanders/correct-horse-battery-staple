@@ -6,14 +6,9 @@ class CorrectHorseBatteryStaple::Writer::Redis < CorrectHorseBatteryStaple::Writ
   include CorrectHorseBatteryStaple::Backend::Redis
 
   def initialize(dest, options={})
-    (dbname, host, port)   = dest.split(':')
-    options[:dbname]     ||= (dbname || "chbs")
-    options[:host]       ||= (host   || "127.0.0.1")
-    options[:port]       ||= (port  || 6379).to_i
-
     super
+    parse_uri(dest)
   end
-
 
   def write_corpus(corpus)
     create_database

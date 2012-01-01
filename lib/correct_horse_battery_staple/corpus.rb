@@ -21,5 +21,6 @@ class CorrectHorseBatteryStaple::Corpus
   autoload :Serialized, 'correct_horse_battery_staple/corpus/serialized'
   autoload :Isam,       'correct_horse_battery_staple/corpus/isam'
   autoload :Sqlite,     'correct_horse_battery_staple/corpus/sqlite'
+  autoload :Redis,      'correct_horse_battery_staple/corpus/redis'
 end
 

@@ -8,20 +8,23 @@ module CorrectHorseBatteryStaple::Backend::Redis
     base.send :include, InstanceMethods
   end
 
-  
-  LENGTH_SET_KEY_NAME      = "wordlength"
-  PERCENTILE_SET_KEY_NAME  = "percentile"
-
-  
   module ClassMethods
   end
 
   module InstanceMethods
+    def parse_uri(dest)
+      (dbname, host, port)   = dest.split(':')
+      options[:dbname]     ||= (dbname || "chbs")
+      options[:host]       ||= (host   || "127.0.0.1")
+      options[:port]       ||= (port  || 6379).to_i
+    end
+
     def add_word(w)
       percentile = [0, w.percentile].max
 
       @db.zadd(@length_key, w.word.length, w.word)
       @db.zadd(@percentile_key, percentile, w.word)
+      @db.zadd(@frequency_key, w.frequency, w.word)
     end
 
     def save_stats(stats)
@@ -31,12 +34,13 @@ module CorrectHorseBatteryStaple::Backend::Redis
     end
 
     def create_database
-      db.del @length_key, @percentile_key
+      db.del @length_key, @percentile_key, @frequency_key
     end
 
     def open_database
-      @length_key            = make_key(LENGTH_SET_KEY_NAME)
-      @percentile_key        = make_key(PERCENTILE_SET_KEY_NAME)
+      @length_key            = make_key("length_zset")
+      @percentile_key        = make_key("percentile_zset")
+      @freqency_key          = make_key("frequency_zset")
       @db = ::Redis.new(:host => options[:host], :port => options[:port])
     end
 
