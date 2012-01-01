@@ -36,7 +36,9 @@ command :convert do |c|
     options.default :limit => -1
 
     infile = args[0]
-    outfile = args[1] && args[1] != "-" ? open(args[1], "w") : STDOUT
+    outfile = args[1] && args[1] != "-" ?
+              (!args[1].include?(':') ? open(args[1], "w") : args[1]) :
+              STDOUT
 
     options.iformat ||= CorrectHorseBatteryStaple::Corpus.format_for(infile)
     unless options.oformat
@@ -189,14 +191,20 @@ command :mkcorpus do |c|
 end
 
 def with_tempfile(realname)
-  if realname.is_a?(String) or realname.is_a?(File) && File.exist?(realname.path)
-    realpath = realname.respond_to?(:path) ? realname.path : realname
-    tempname = File.join(File.dirname(realpath), ".temp-#{File.basename(realpath)}")
-    yield tempname
-    File.rename tempname, realpath
+  pathpart = realname.respond_to?(:path) ? realname.path : realname
+  if (realname.is_a?(String) ||
+      (realname.is_a?(File) && File.exist?(realname.path))) &&
+      ! pathpart.include?(':')
+    begin
+      tempname = File.join(File.dirname(realpath), ".temp-#{File.basename(realpath)}")
+      yield tempname
+      File.rename tempname, realpath
+    rescue
+      File.delete(tempname) if File.exist?(tempname)
+      raise
+    end
   else
+    STDERR.puts "taking direct path"
     yield realname
   end
-rescue
-  File.delete(tempname) if File.exist?(tempname)
 end
