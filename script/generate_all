@@ -1,21 +1,25 @@
 #!/bin/sh
 
-formats="json csv isam marshal sqlite"
+formats="json csv isam marshal"
+
+if ! ruby -v | grep -q jruby; then
+  formats="$formats sqlite"
+fi
 
 MKCORPUS="ruby -Ilib ./bin/chbs --trace mkcorpus"
 CONVERT="ruby -Ilib ./bin/chbs --trace convert"
 
 for format in $formats; do
   echo "Creating corpus files for format $format"
-  $MKCORPUS -i wiktionary -o corpus/gutenberg2005.$format data/wiktionary/gutenberg2005/*
-  $MKCORPUS -i tvscripts -o corpus/tvscripts.$format data/wiktionary/tv-and-movies/*
-  $MKCORPUS -i wordfrequency -o corpus/wordfrequency.$format data/wordfreq/toplemmas/*
+  eval $MKCORPUS -i wiktionary -o corpus/gutenberg2005.$format data/wiktionary/gutenberg2005/*
+  eval $MKCORPUS -i tvscripts -o corpus/tvscripts.$format data/wiktionary/tv-and-movies/*
+  eval $MKCORPUS -i wordfrequency -o corpus/wordfrequency.$format data/wordfreq/toplemmas/*
 done
 
 echo "Making size100 test corpus in all formats..."
-$MKCORPUS -i tvscripts --randomize --limit 100 -o corpus/size100.json data/wiktionary/tv-and-movies/*
+eval $MKCORPUS -i tvscripts --randomize --limit 100 -o corpus/size100.json data/wiktionary/tv-and-movies/*
 for format in $formats; do
   if [ $format != "json" ]; then
-    $CONVERT corpus/size100.json corpus/size100.$format
+    eval $CONVERT corpus/size100.json corpus/size100.$format
   fi
 done
