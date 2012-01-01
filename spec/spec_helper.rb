@@ -1,4 +1,4 @@
-return if defined?(FIXTURES_DIR)
+unless Object.const_defined?("FIXTURES_DIR")
 
 GEM_DIR = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 LIB_DIR = File.join(GEM_DIR, "lib")
@@ -17,3 +17,4 @@ require 'rspec'
 Dir[File.join(File.dirname(__FILE__),'support','**','*.rb')].each { |f| require File.expand_path(f) }
 
 require 'correct_horse_battery_staple'
+end

@@ -9,7 +9,7 @@ gem "memoizable"
 
 # external DBs
 gem "sqlite3", :platforms => [:mri]
-# gem "redis"
+gem "redis"
 
 # cmdline
 gem "commander"
