@@ -5,5 +5,5 @@
 : ${RUBIES:=ree@chbs,1.9.3-p0@chbs,jruby-1.6.5@chbs}
 
 # rvm "$RUBIES" do 'bundle install'
-rvm "$RUBIES" do zsh -c 'bundle install >/dev/null && rake spec'
+rvm "$RUBIES" do zsh -c 'bundle install >/dev/null && bundle exec rake spec'
 

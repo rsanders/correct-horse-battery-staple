@@ -1,3 +1,5 @@
+# doesn't handle X...Y
+
 class CorrectHorseBatteryStaple::RangeParser
   NUM = '-?(?:\.[0-9]+|[0-9]+|[0-9]+\.[0-9]+|[0-9]+\.(?!\.))'
   SPACE = " *"
