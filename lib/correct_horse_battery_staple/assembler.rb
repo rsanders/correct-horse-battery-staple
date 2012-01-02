@@ -6,7 +6,7 @@ class CorrectHorseBatteryStaple::Assembler
 
   attr_accessor :words
 
-  VALID_INITIAL_CHARS = ([*'A'..'Z'] + [*'a'..'z']).map {|ls| ls[0]}
+  VALID_INITIAL_CHARS = ([*'a'..'z']).map {|ls| ls[0]}
 
   def initialize(parser = nil)
     @parser = (parser || CorrectHorseBatteryStaple::Parser::Regex.new(:wiktionary))
