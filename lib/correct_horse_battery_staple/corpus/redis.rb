@@ -63,8 +63,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
       sets << get_word_ids_in_zset(@percentile_key, percentile_range) if percentile_range
       sets << get_word_ids_in_zset(@length_key, length_range)         if length_range
 
-
-      candidates = (sets.length == 1 ? sets[0] : (sets.reduce {|a,b| intersection(a,b)}))
+      candidates = (sets.length == 1 ? sets[0] : intersection(*sets))
       get_words_for_ids(array_sample(candidates, count))
     end
   end
@@ -76,8 +75,8 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     end
   end
 
-  def intersection(a,b)
-    a & b
+  def intersection(*sets)
+    sets.reduce {|a,b| a & b}
   end
   memoize :intersection
 

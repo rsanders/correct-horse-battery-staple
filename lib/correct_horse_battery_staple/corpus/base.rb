@@ -106,6 +106,7 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   def words
     execute_filters.map {|entry| entry.word }
   end
+  memoize :words
 
   # no-op for serialized forms
   def precache(max=0)
