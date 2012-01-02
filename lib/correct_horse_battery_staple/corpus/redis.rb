@@ -1,4 +1,5 @@
 require 'bigdecimal'
+require 'hiredis'
 require 'redis'
 
 class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corpus::Base

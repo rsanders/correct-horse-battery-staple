@@ -11,6 +11,10 @@ gem "memoizable"
 gem "sqlite3", :platforms => [:mri]
 gem "redis"
 
+platform :mri do
+  gem "hiredis"
+end
+
 # cmdline
 gem "commander"
 platform :jruby do

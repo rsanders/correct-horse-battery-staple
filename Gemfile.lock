@@ -13,6 +13,7 @@ GEM
       ffi (>= 1.0.9)
       ffi-locale (>= 1.0.0)
     highline (1.5.2)
+    hiredis (0.4.4)
     hoe (2.12.3)
       rake (~> 0.8)
     hoe-bundler (1.1.0)
@@ -89,6 +90,7 @@ DEPENDENCIES
   commander
   fastercsv
   ffi-ncurses
+  hiredis
   hoe
   hoe-bundler
   hoe-debugging
