@@ -1,0 +1,17 @@
+#!/bin/zsh
+
+: ${ITERATIONS:=100000}
+: ${CORPUS:=tvscripts}
+
+. ~/.rvm/scripts/rvm
+
+FORMAT=redis
+if [ -z "$FORMAT" ]; then
+   echo "You must specify a format as first param" >&2
+   exit 1
+fi
+PROF=`which ruby-prof`
+
+bundle exec /usr/bin/time -l ruby -Ilib $PROF -f prof-$FORMAT-$CORPUS.html \
+    -p graph_html -- ./bin/chbs --trace generate -c tvscripts:127.0.0.1:6379.redis \
+    -n $ITERATIONS > /dev/null

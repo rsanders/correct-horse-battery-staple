@@ -63,9 +63,9 @@ Benchmark.bm(18) do |b|
       end
       ENV.delete('pick_strategy')
     elsif format == "redis"
-      b.report("redis dr")   { generate_many_redis("tvscripts:127.0.0.1:6379.redis", word_count, "drange") }
-      b.report("redis std")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis") }
-      b.report("redis2")     { generate_many_redis("tvscripts:127.0.0.1:6379.redis2") }
+      b.report("redis dr (10k)")   { generate_many_redis("tvscripts:127.0.0.1:6379.redis", 10_000, "drange") }
+      # b.report("redis2")     { generate_many_redis("tvscripts:127.0.0.1:6379.redis2", 10_000) }
+      # b.report("redis std")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis", 10_000) }
     else
       b.report("#{format}") { generate_many(format) }
     end

@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'benchmark'
+require 'set'
+
+count = (ARGV[0] || 100_000).to_i
+
+range = 0..count
+
+
+puts "*** Creating Arrays and Sets ***"
+Benchmark.bmbm do |b|
+  b.report("Array") do
+    @by3 = range.step(3).to_a
+    @by4 = range.step(2).to_a
+  end
+  b.report("Set") do
+    @set3 = Set.new(@by3)
+    @set4 = Set.new(@by4)
+  end
+end
+
+puts "\n*** Comparing Set and Array intersection for size #{@by3.length} / #{@by4.length} ***"
+Benchmark.bm(12) do |b|
+  b.report("array & ") { (@by3  & @by4).count }
+  b.report("set   & ") { @count = (@set3 & @set4).count }
+end
+
+puts "\nIntersection size = #{@count}"
+
+# -*- mode: Ruby -*-

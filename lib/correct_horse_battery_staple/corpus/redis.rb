@@ -54,7 +54,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     # incompat check
     raise NotImplementedError, "Redis does not support :filter option" if options[:filter]
 
-    strategy = options.delete(:strategy) || ENV['pick_strategy'] || "standard"
+    strategy = options.delete(:strategy) || ENV['pick_strategy'] || "drange"
     send("pick_#{strategy}", count, options)
   end
 
