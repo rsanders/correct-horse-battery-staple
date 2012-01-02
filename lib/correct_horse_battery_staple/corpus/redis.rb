@@ -65,7 +65,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
 
 
       candidates = (sets.length == 1 ? sets[0] : (sets.reduce {|a,b| intersection(a,b)}))
-      get_words_for_ids(array_sample(candidates, count*2))[0...count]
+      get_words_for_ids(array_sample(candidates, count))
     end
   end
 
@@ -90,25 +90,12 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     ids.map {|id| CorrectHorseBatteryStaple::Word.new(:word => get_word_by_id(id)) }
   end
 
-  # def get_words_for_ids(ids)
-  #   ids = Array(ids)
-  #   rows = @db.execute("select #{COLUMNS.join(", ")} from entries where id in (#{ids.join(',')})")
-
-  #   words = []
-  #   ids.each do |id|
-  #     words << rows.find {|r| r[0] == id }
-  #   end
-  #   words.map {|row| word_from_row(row)}
-  # end
-
 
   def close
     super
   end
 
   protected
-
-  # COLUMNS = %w[id word frequency idx rank percentile]
 
   def table
     percentiles = db.zrangebyscore(@percentile_key, -1, 101, :withscores => true)

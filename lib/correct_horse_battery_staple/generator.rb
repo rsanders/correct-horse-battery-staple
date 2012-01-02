@@ -6,6 +6,7 @@ require 'securerandom'
 #
 class CorrectHorseBatteryStaple::Generator
   include CorrectHorseBatteryStaple::Common
+  include CorrectHorseBatteryStaple::Memoize
 
   attr_accessor :word_length, :corpus
 
