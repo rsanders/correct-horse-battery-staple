@@ -26,6 +26,19 @@ def generate_many(format, count = 100_000, corpus = "tvscripts")
   end
 end
 
+def generate_many_redis(uri, count = 100_000)
+  generator = CorrectHorseBatteryStaple::Generator.new CorrectHorseBatteryStaple.load_corpus(uri, "redis")
+  word_length = 3..9
+  percentile = 30..80
+  number_of_words = 4
+
+  count.times do
+    generator.make(number_of_words,
+                   :word_length => word_length,
+                   :percentile => percentile)
+  end
+end
+
 puts "*** Loading Corpus ***"
 Benchmark.bmbm do |b|
   @formats.each do |format|
@@ -35,7 +48,7 @@ end
 
 puts "\n*** Generating 100,000 words ***"
 Benchmark.bm(18) do |b|
-  @formats.each do |format|
+  ["redis", *@formats].each do |format|
     if format == "sqlite"
       ["standard", "standard2", "rtree", "discrete", "discrete2"].each do |strategy|
         b.report("#{format} (#{strategy})") do
@@ -44,6 +57,8 @@ Benchmark.bm(18) do |b|
         end
       end
       ENV.delete('pick_strategy')
+    elsif format == "redis"
+      b.report("redis")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis") }
     else
       b.report("#{format}") { generate_many(format) }
     end

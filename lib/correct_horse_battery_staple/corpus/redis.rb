@@ -75,6 +75,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   def get_words_in_zset(key, range)
     db.zrangebyscore(key, range.begin, range.end)
   end
+  memoize :get_words_in_zset
 
   def get_words_for_ids(ids)
     ids.map {|w| CorrectHorseBatteryStaple::Word.new(:word => w) }
