@@ -13,18 +13,32 @@ module CorrectHorseBatteryStaple::Backend::Redis
 
   module InstanceMethods
     def parse_uri(dest)
-      (dbname, host, port)   = dest.gsub(/\.redis/, '').split(':')
+      (dbname, host, port)   = dest.gsub(/\.redis[0-9]?/, '').split(':')
       options[:dbname]     ||= (dbname || "chbs")
       options[:host]       ||= (host   || "127.0.0.1")
       options[:port]       ||= (port  || 6379).to_i
     end
 
-    def add_word(w)
+    def add_word(w, wid=nil)
       percentile = [0, w.percentile].max
 
-      @db.zadd(@length_key, w.word.length, w.word)
-      @db.zadd(@percentile_key, percentile, w.word)
-      @db.zadd(@frequency_key, w.frequency, w.word)
+      wid = get_new_word_id if wid.nil?
+
+      db.zadd(@words_key, wid, w.word)
+      db.zadd(@length_key, w.word.length, wid)
+      db.zadd(@percentile_key, percentile, wid)
+      db.zadd(@frequency_key, w.frequency, wid)
+    end
+
+    #
+    # Note that this does NOT work inside a multi/exec
+    #
+    def get_new_word_id
+      db.incr(@id_key)
+    end
+
+    def get_word_by_id(wid)
+      db.zrangebyscore(@words_key, wid, wid, :limit => [0,1])[0] rescue nil
     end
 
     def load_stats
@@ -36,15 +50,18 @@ module CorrectHorseBatteryStaple::Backend::Redis
     end
 
     def create_database
-      db.del @length_key, @percentile_key, @frequency_key, @stats_key
+      db.del(@length_key, @percentile_key, @frequency_key, @stats_key,
+             @words_key, @id_key)
     end
 
     def open_database
       @db ||= begin
                 @length_key            = make_key("length_zset")
                 @percentile_key        = make_key("percentile_zset")
-                @freqency_key          = make_key("frequency_zset")
+                @frequency_key         = make_key("frequency_zset")
                 @stats_key             = make_key("stats_hash")
+                @words_key             = make_key("words_zset")
+                @id_key                = make_key("word_id_counter")
                 ::Redis.new(:host => options[:host], :port => options[:port])
               end
     end
@@ -57,7 +74,7 @@ module CorrectHorseBatteryStaple::Backend::Redis
     end
 
     def make_key(name)
-      "chbs_" + "dbname" + "_" + name
+      "chbs_#{options[:dbname]}_#{name}"
     end
 
     def gensym_temp

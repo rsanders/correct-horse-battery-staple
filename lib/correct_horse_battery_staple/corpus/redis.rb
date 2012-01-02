@@ -1,6 +1,7 @@
 require 'bigdecimal'
 require 'hiredis'
 require 'redis'
+require 'set'
 
 class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corpus::Base
   include CorrectHorseBatteryStaple::Backend::Redis
@@ -29,7 +30,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   end
 
   def size
-    @size ||= db.zcard(@percentile_key)
+    @size ||= db.zcard(@words_key)
   end
 
 
@@ -59,17 +60,17 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
       get_words_for_ids(pick_random_words(count))
     else
       sets = []
-      sets << get_words_in_zset(@percentile_key, percentile_range) if percentile_range
-      sets << get_words_in_zset(@length_key, length_range)         if length_range
+      sets << get_word_ids_in_zset(@percentile_key, percentile_range) if percentile_range
+      sets << get_word_ids_in_zset(@length_key, length_range)         if length_range
 
-      get_words_for_ids(array_sample(sets.reduce {|a,b| union(a,b) },count))
+      get_words_for_ids(array_sample(sets.reduce {|a,b| union(a,b) }.to_a, count))
     end
   end
 
   def pick_random_words(count)
     count.times.map do
       idx = random_number(size)-1
-      db.zrange(@percentile_key, idx, idx)[0]
+      db.zrange(@words_key, idx, idx)[0]
     end
   end
 
@@ -78,13 +79,13 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   end
   memoize :union
 
-  def get_words_in_zset(key, range)
+  def get_word_ids_in_zset(key, range)
     db.zrangebyscore(key, range.begin, range.end)
   end
-  memoize :get_words_in_zset
+  memoize :get_word_ids_in_zset
 
   def get_words_for_ids(ids)
-    ids.map {|w| CorrectHorseBatteryStaple::Word.new(:word => w) }
+    ids.map {|id| CorrectHorseBatteryStaple::Word.new(:word => get_word_by_id(id)) }
   end
 
   # def get_words_for_ids(ids)

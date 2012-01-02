@@ -30,8 +30,9 @@ class CorrectHorseBatteryStaple::Writer::Redis < CorrectHorseBatteryStaple::Writ
   def save_entries(corpus)
     size = corpus.size
     corpus.each_with_index do |w, index|
-      add_word(w)
+      add_word(w, index)
     end
+    db.set(@id_key, size+1)
   ensure
   end
 
