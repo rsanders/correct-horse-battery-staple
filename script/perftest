@@ -26,8 +26,10 @@ def generate_many(format, count = 100_000, corpus = "tvscripts")
   end
 end
 
-def generate_many_redis(uri, count = 100_000)
-  generator = CorrectHorseBatteryStaple::Generator.new CorrectHorseBatteryStaple.load_corpus(uri, "redis")
+def generate_many_redis(uri, count = 100_000, strategy = nil)
+  ENV['pick_strategy'] = strategy
+  format = uri.include?('.redis2') ? 'redis2' : 'redis'
+  generator = CorrectHorseBatteryStaple::Generator.new CorrectHorseBatteryStaple.load_corpus(uri, format)
   word_length = 3..9
   percentile = 30..80
   number_of_words = 4
@@ -37,6 +39,7 @@ def generate_many_redis(uri, count = 100_000)
                    :word_length => word_length,
                    :percentile => percentile)
   end
+  ENV.delete('pick_strategy')
 end
 
 puts "*** Loading Corpus ***"
@@ -47,6 +50,8 @@ Benchmark.bmbm do |b|
 end
 
 puts "\n*** Generating 100,000 words ***"
+word_count = 100_000
+
 Benchmark.bm(18) do |b|
   ["redis", *@formats].each do |format|
     if format == "sqlite"
@@ -58,7 +63,9 @@ Benchmark.bm(18) do |b|
       end
       ENV.delete('pick_strategy')
     elsif format == "redis"
-      b.report("redis")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis") }
+      b.report("redis dr")   { generate_many_redis("tvscripts:127.0.0.1:6379.redis", word_count, "drange") }
+      b.report("redis std")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis") }
+      b.report("redis2")     { generate_many_redis("tvscripts:127.0.0.1:6379.redis2") }
     else
       b.report("#{format}") { generate_many(format) }
     end
