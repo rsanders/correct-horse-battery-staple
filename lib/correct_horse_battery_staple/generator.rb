@@ -26,6 +26,7 @@ class CorrectHorseBatteryStaple::Generator
     candidate_count = @corpus.count_candidates(options)
     (log(candidate_count) / log(2)).floor
   end
+  memoize :estimate_entropy
 
   def words
     @words ||= @corpus.result
