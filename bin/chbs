@@ -195,15 +195,17 @@ end
 
 def with_tempfile(realname)
   pathpart = realname.respond_to?(:path) ? realname.path : realname
+  tempname = nil
   if (realname.is_a?(String) ||
       (realname.is_a?(File) && File.exist?(realname.path))) &&
+      ! pathpart != '-'
       ! pathpart.include?(':')
     begin
-      tempname = File.join(File.dirname(realpath), ".temp-#{File.basename(realpath)}")
+      tempname = File.join(File.dirname(pathpart), ".temp-#{File.basename(pathpart)}")
       yield tempname
-      File.rename tempname, realpath
+      File.rename tempname, pathpart
     rescue
-      File.delete(tempname) if File.exist?(tempname)
+      File.delete(tempname) if tempname && File.exist?(tempname)
       raise
     end
   else
