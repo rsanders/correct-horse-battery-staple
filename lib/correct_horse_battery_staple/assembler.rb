@@ -18,6 +18,9 @@ class CorrectHorseBatteryStaple::Assembler
         @parser.parse open(url)
       end.reduce(:+).
           select {|wstruct| VALID_INITIAL_CHARS.include?(wstruct.word[0]) }.
+      # we take a round-trip through a Hash to weed out dupes
+          inject({}) {|h, wstruct|  h[wstruct.word] = wstruct; h }.
+          values.
           sort
 
     self
