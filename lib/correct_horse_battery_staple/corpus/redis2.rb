@@ -30,11 +30,17 @@ class CorrectHorseBatteryStaple::Corpus::Redis2 < CorrectHorseBatteryStaple::Cor
     else
       sets = []
       sets << make_subset_spec(@percentile_key, percentile_range) if percentile_range
-      sets << make_subset_spec(@length_key, length_range)         if length_range
+
+      # this isn't correct because lenprod_key will have values in the range 18...19
+      # sets << make_subset_spec(@lenprod_key, length_range)         if length_range
+      if length_range
+        sets << [@lenprod_key, ["-inf", "(#{length_range.begin}"],
+                               ["#{length_range.end.floor + 1}", "inf"]]
+      end
 
       # returns union set key
       tempkey = subset_and_union(sets)
-      STDERR.puts "result count in #{tempkey} is #{db.zcard(tempkey)}"
+      # STDERR.puts "result count in #{tempkey} is #{db.zcard(tempkey)}"
 
       get_words_for_ids(pick_sset_random(tempkey, count))
     end
@@ -50,7 +56,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis2 < CorrectHorseBatteryStaple::Cor
     key = gensym_temp
     source_key = spec.shift
     db.zunionstore(key, [source_key])
-    db.expire(key, 300)
+    db.expire(key, 180)
     spec.each do |(min, max)|
       db.zremrangebyscore(key, min, max)
     end
