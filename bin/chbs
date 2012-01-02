@@ -198,7 +198,7 @@ def with_tempfile(realname)
   tempname = nil
   if (realname.is_a?(String) ||
       (realname.is_a?(File) && File.exist?(realname.path))) &&
-      ! pathpart != '-'
+      ! pathpart != '-' &&
       ! pathpart.include?(':')
     begin
       tempname = File.join(File.dirname(pathpart), ".temp-#{File.basename(pathpart)}")
@@ -209,7 +209,6 @@ def with_tempfile(realname)
       raise
     end
   else
-    STDERR.puts "taking direct path"
     yield realname
   end
 end
