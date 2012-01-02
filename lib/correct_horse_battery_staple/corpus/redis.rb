@@ -38,11 +38,11 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   ## our own collection operations
 
   def entries
-    @entries ||= table
+    table
   end
 
   def sorted_entries
-    entries
+    entries.sort
   end
 
 
@@ -63,7 +63,9 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
       sets << get_word_ids_in_zset(@percentile_key, percentile_range) if percentile_range
       sets << get_word_ids_in_zset(@length_key, length_range)         if length_range
 
-      get_words_for_ids(array_sample(sets.reduce {|a,b| union(a,b) }.to_a, count))
+
+      candidates = (sets.length == 1 ? sets[0] : (sets.reduce {|a,b| intersection(a,b)}))
+      get_words_for_ids(array_sample(candidates, count*2))[0...count]
     end
   end
 
@@ -74,10 +76,10 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     end
   end
 
-  def union(a,b)
+  def intersection(a,b)
     a & b
   end
-  memoize :union
+  memoize :intersection
 
   def get_word_ids_in_zset(key, range)
     db.zrangebyscore(key, range.begin, range.end)
