@@ -120,9 +120,9 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
     end
     statement = [statement,
                  (wheres.empty? ? "" : " WHERE " + wheres.join(" AND ")),
-                 # "order by RANDOM()",
+                 "order by RANDOM()",
                  "limit ?"].join(" ")
-    params << [count, 250].max
+    params << [count, 20].max
     query = prepare(statement)
     result = array_sample(query.execute!(*params), count).
       map { |row| word_from_row(row) }
@@ -149,7 +149,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
                  (wheres.empty? ? "" : " WHERE " + wheres.join(" AND ")),
                  # "order by RANDOM()",
                  "limit ?"].join(" ")
-    params << [count, 250].max
+    params << [count, 1000].max
     query = prepare(statement)
     ids = array_sample(query.execute!(*params), count).
       map {|r| r[0]}
@@ -165,7 +165,6 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
 
   # discrete method
   def pick_discrete(count, options = {})
-
     p_range = options[:percentile] or 0..100
     l_range = options[:word_length] or 4..12
 
