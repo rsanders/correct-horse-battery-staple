@@ -118,6 +118,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     CorrectHorseBatteryStaple::Backend::Redis::DRange.new(@db, key, outer_range,
                                                           inner_range, divisor)
   end
+  memoize :discontiguous_range_map
 
   # XXX - does not handle exclusive endpoints
   def range_cover?(outer, inner)
