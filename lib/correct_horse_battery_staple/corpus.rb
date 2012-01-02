@@ -5,6 +5,7 @@ class CorrectHorseBatteryStaple::Corpus
       case CorrectHorseBatteryStaple::Corpus.format_for(filename)
       when 'isam' then CorrectHorseBatteryStaple::Corpus::Isam
       when 'sqlite' then CorrectHorseBatteryStaple::Corpus::Sqlite
+      when 'redis' then CorrectHorseBatteryStaple::Corpus::Redis
       else CorrectHorseBatteryStaple::Corpus::Serialized
       end
 

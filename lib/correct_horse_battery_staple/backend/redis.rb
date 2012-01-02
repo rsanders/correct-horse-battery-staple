@@ -13,7 +13,7 @@ module CorrectHorseBatteryStaple::Backend::Redis
 
   module InstanceMethods
     def parse_uri(dest)
-      (dbname, host, port)   = dest.split(':')
+      (dbname, host, port)   = dest.gsub(/\.redis/, '').split(':')
       options[:dbname]     ||= (dbname || "chbs")
       options[:host]       ||= (host   || "127.0.0.1")
       options[:port]       ||= (port  || 6379).to_i

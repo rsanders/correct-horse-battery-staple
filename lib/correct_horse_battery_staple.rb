@@ -39,10 +39,14 @@ module CorrectHorseBatteryStaple
   end
 
   def self.load_corpus(corpus_name, formats = nil)
+    if corpus_name.include?(':')
+      return CorrectHorseBatteryStaple::Corpus.read corpus_name
+    end
+
     formats = Array(formats || SUPPORTED_FORMATS)
     filename = corpus_name.match(/[.?]/) ? corpus_name :
       self.find_corpus(corpus_name, formats)
-    unless filename && File.exist?(filename)
+    unless (filename && File.exist?(filename))
       raise ArgumentError, "Cannot find corpus #{corpus_name}"
     end
 
