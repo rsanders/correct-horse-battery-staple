@@ -50,7 +50,9 @@ command :convert do |c|
     end
 
     corpus = CorrectHorseBatteryStaple.load_corpus(args[0], options.iformat)
-    corpus.precache(16_000_000)
+    if options.precache
+      corpus.precache(16_000_000)
+    end
 
     # CSV doesn't currently persist stats
     corpus.recalculate if options.recalculate || options.iformat.to_s == "csv"
@@ -91,6 +93,7 @@ command :generate do |c|
   c.option '-f FORMAT', '--format FORMAT', 'Set the corpus format'
   c.option '-c CORPUSFILE', '--corpus CORPUSFILE', "File to use as the source corpus"
   c.option '-n COUNT', '--repeat COUNT', Integer, 'How many passwords to generate'
+  c.option '-P', '--precache', 'Precache the word list in memory'
 
   # filters
   c.option '-W MIN..MAX', '--wordsize MIN..MAX',

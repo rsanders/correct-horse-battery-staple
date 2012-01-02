@@ -49,12 +49,8 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   end
 
   def prelude
-    @prelude || parse_prelude 
+    @prelude || parse_prelude
   end
-
-  # def stats
-  #   @prelude["stats"] || {}
-  # end
 
   def parse_prelude
     @file.seek 0
