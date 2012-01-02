@@ -61,7 +61,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
       sets << get_words_in_zset(@percentile_key, percentile_range) if percentile_range
       sets << get_words_in_zset(@length_key, length_range)         if length_range
 
-      get_words_for_ids(array_sample(sets.reduce {|a,b| a & b },count))
+      get_words_for_ids(array_sample(sets.reduce {|a,b| union(a,b) },count))
     end
   end
 
@@ -71,6 +71,11 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
       db.zrange(@percentile_key, idx, idx)[0]
     end
   end
+
+  def union(a,b)
+    a & b
+  end
+  memoize :union
 
   def get_words_in_zset(key, range)
     db.zrangebyscore(key, range.begin, range.end)
