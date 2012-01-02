@@ -128,8 +128,8 @@ command :generate do |c|
       make_options[:percentile] = f_percentile
     end
 
-    entropy = number_of_words * corpus.entropy_per_word.floor
     if options.verbose
+      entropy = number_of_words * corpus.entropy_per_word.floor
       guesses_per_sec = 1000.0
       search_space = 2**entropy
       years = search_space / guesses_per_sec / (365*24*3600)
