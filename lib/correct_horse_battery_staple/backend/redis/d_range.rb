@@ -17,13 +17,18 @@ class CorrectHorseBatteryStaple::Backend::Redis::DRange
   end
   
   def count
-    iterate_ranges do |min, max|
-      zcount(min, max)
-    end.reduce(:+)
+    # @db.multi do
+    #   iterate_ranges do |min, max|
+    #     zcount(min, max)
+    #   end
+    # end.reduce(:+)
+    precache_counts
+    @counts.values.reduce(:+)
   end
   memoize :count
 
   def pick_nth(n)
+    precache_counts
     return nil if n > count-1
 
     pos = 0
@@ -44,6 +49,18 @@ class CorrectHorseBatteryStaple::Backend::Redis::DRange
   end
 
   protected
+
+  def precache_counts
+    return if @precached_counts
+    counts = @db.multi do
+      @outer.each do |base|
+        zcount(*minmax_for_base(base))
+      end
+    end
+    @counts = Hash[@outer.to_a.zip(counts)]
+    @precached_counts = true
+    @counts
+  end
 
   def count_in_base(b)
     @counts[b] ||= zcount(*minmax_for_base(b))
