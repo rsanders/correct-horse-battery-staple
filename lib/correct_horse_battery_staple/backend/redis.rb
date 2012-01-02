@@ -28,9 +28,9 @@ module CorrectHorseBatteryStaple::Backend::Redis
       wid = get_new_word_id if wid.nil?
 
       db.zadd(@words_key, wid, w.word)
-      db.zadd(@length_key, w.word.length, wid)
       db.zadd(@percentile_key, percentile, wid)
-      db.zadd(@frequency_key, w.frequency, wid)
+      # db.zadd(@frequency_key, w.frequency, wid)
+      db.zadd(@lenprod_key, w.word.length + (percentile / 100.0), wid)
     end
 
     #
@@ -53,16 +53,18 @@ module CorrectHorseBatteryStaple::Backend::Redis
     end
 
     def create_database
-      db.del(@length_key, @percentile_key, @frequency_key, @stats_key,
+      db.del(@length_key, @percentile_key, @frequency_key, @lenprod_key,  @stats_key,
              @words_key, @id_key)
     end
 
     def open_database
       @db ||= begin
-                @gensym_id = 0
+                @gensym_id             = 0
                 @length_key            = make_key("length_zset")
                 @percentile_key        = make_key("percentile_zset")
                 @frequency_key         = make_key("frequency_zset")
+                # scores given by w.word.length + w.percentile/100.0
+                @lenprod_key           = make_key("lenprod_zset")
                 @stats_key             = make_key("stats_hash")
                 @words_key             = make_key("words_zset")
                 @id_key                = make_key("word_id_counter")
@@ -86,5 +88,7 @@ module CorrectHorseBatteryStaple::Backend::Redis
       make_key("TEMP_#{Process.pid}_#{@gensym_id += 1}")
     end
   end
+
+  autoload :DRange, 'correct_horse_battery_staple/backend/redis/d_range.rb'
 end
 

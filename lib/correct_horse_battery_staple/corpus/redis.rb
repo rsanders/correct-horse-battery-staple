@@ -29,8 +29,12 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     entries.each &block
   end
 
+  def count
+    @count ||= db.zcard(@words_key)
+  end
+
   def size
-    @size ||= db.zcard(@words_key)
+    stats[:size] || count
   end
 
 
@@ -46,9 +50,18 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   end
 
 
+  def pick(count, options = {})
+    # incompat check
+    raise NotImplementedError, "Redis does not support :filter option" if options[:filter]
+
+    strategy = options.delete(:strategy) || ENV['pick_strategy'] || "standard"
+    send("pick_#{strategy}", count, options)
+  end
+
+
   ## optimized pick implementations - they do NOT support :filter, though
 
-  def pick(count, options = {})
+  def pick_standard(count, options = {})
     percentile_range = options[:percentile]
     length_range     = options[:word_length]
 
@@ -61,13 +74,61 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     else
       sets = []
       sets << get_word_ids_in_zset(@percentile_key, percentile_range) if percentile_range
-      sets << get_word_ids_in_zset(@length_key, length_range)         if length_range
+      sets << get_word_ids_in_zset(@lenprod_key, length_range)         if length_range
 
       candidates = (sets.length == 1 ? sets[0] : intersection(*sets))
       get_words_for_ids(array_sample(candidates, count))
     end
   end
 
+
+
+  def pick_drange(count, options = {})
+    percentile_range = options[:percentile]
+    length_range     = options[:word_length]
+
+    if percentile_range && range_cover?(percentile_range, 0..100)
+      percentile_range = nil
+    end
+
+    corpus_length_range = self.corpus_length_range
+    if !length_range || range_cover?(length_range, corpus_length_range)
+      length_range = nil
+    end
+
+    if (!percentile_range && !length_range)
+      get_words_for_ids(pick_random_words(count))
+    else
+      dspace = discontiguous_range_map(@lenprod_key, length_range, percentile_range)
+      max = dspace.count
+      ids = count.times.map do
+        dspace.pick_nth(random_number(max))
+      end
+      # STDERR.puts "ids from decimal are #{ids.inspect}"
+      get_words_for_ids(ids)
+    end
+  end
+
+  def zcount(key, min, max)
+    db.zcount(key, min, max)
+  end
+  memoize :zcount
+
+  def discontiguous_range_map(key, outer_range, inner_range, divisor=100)
+    CorrectHorseBatteryStaple::Backend::Redis::DRange.new(@db, key, outer_range,
+                                                          inner_range, divisor)
+  end
+
+  # XXX - does not handle exclusive endpoints
+  def range_cover?(outer, inner)
+    outer.cover?(inner.begin) && outer.cover?(inner.end)
+  end
+
+  # TODO: make this use actual data from stored stats
+  def corpus_length_range
+    3..18
+  end
+
   def pick_random_words(count)
     count.times.map do
       idx = random_number(size)-1
