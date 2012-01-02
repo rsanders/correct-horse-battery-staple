@@ -55,7 +55,8 @@ word_count = 100_000
 Benchmark.bm(18) do |b|
   ["redis", *@formats].each do |format|
     if format == "sqlite"
-      ["standard", "standard2", "rtree", "discrete", "discrete2"].each do |strategy|
+      [ # "standard", "standard2",
+       "rtree", "discrete", "discrete2"].each do |strategy|
         b.report("#{format} (#{strategy})") do
           ENV['pick_strategy'] = strategy
           generate_many(format)
@@ -63,7 +64,7 @@ Benchmark.bm(18) do |b|
       end
       ENV.delete('pick_strategy')
     elsif format == "redis"
-      b.report("redis dr (10k)")   { generate_many_redis("tvscripts:127.0.0.1:6379.redis", 10_000, "drange") }
+      b.report("redis dr")   { generate_many_redis("tvscripts:127.0.0.1:6379.redis", 100_000, "drange") }
       # b.report("redis2")     { generate_many_redis("tvscripts:127.0.0.1:6379.redis2", 10_000) }
       # b.report("redis std")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis", 10_000) }
     else
