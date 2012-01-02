@@ -9,10 +9,14 @@ gem "memoizable"
 
 # external DBs
 gem "sqlite3", :platforms => [:mri]
-gem "redis"
 
 platform :mri do
   gem "hiredis"
+  gem "redis", ">= 2.2.0" # , :require => ["redis", "redis/connection/hiredis"]
+end
+
+platform :jruby do
+  gem "redis", ">= 2.2.0"  
 end
 
 # cmdline

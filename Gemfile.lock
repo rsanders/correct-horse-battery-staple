@@ -101,7 +101,7 @@ DEPENDENCIES
   memoizable
   pry
   rdoc
-  redis
+  redis (>= 2.2.0)
   rspec
   ruby-prof
   rubyforge

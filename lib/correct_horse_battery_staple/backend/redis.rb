@@ -1,4 +1,7 @@
 require 'redis'
+if ! Object.const_defined?("JRUBY_VERSION")
+ require 'redis/connection/hiredis'
+end
 require 'securerandom'
 
 module CorrectHorseBatteryStaple::Backend::Redis
