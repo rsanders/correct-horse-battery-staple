@@ -76,9 +76,8 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   end
 
   def intersection(*sets)
-    sets.reduce {|a,b| a & b}
+    sets.reduce {|a,b|  a & b }
   end
-  memoize :intersection
 
   def get_word_ids_in_zset(key, range)
     db.zrangebyscore(key, range.begin, range.end)
