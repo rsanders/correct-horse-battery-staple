@@ -5,6 +5,7 @@ class CorrectHorseBatteryStaple::Corpus
       case CorrectHorseBatteryStaple::Corpus.format_for(filename)
       when 'isam' then CorrectHorseBatteryStaple::Corpus::Isam
       when 'sqlite' then CorrectHorseBatteryStaple::Corpus::Sqlite
+      when 'redis2' then CorrectHorseBatteryStaple::Corpus::Redis2
       when 'redis' then CorrectHorseBatteryStaple::Corpus::Redis
       else CorrectHorseBatteryStaple::Corpus::Serialized
       end
@@ -23,5 +24,6 @@ class CorrectHorseBatteryStaple::Corpus
   autoload :Isam,       'correct_horse_battery_staple/corpus/isam'
   autoload :Sqlite,     'correct_horse_battery_staple/corpus/sqlite'
   autoload :Redis,      'correct_horse_battery_staple/corpus/redis'
+  autoload :Redis2,      'correct_horse_battery_staple/corpus/redis2'
 end
 

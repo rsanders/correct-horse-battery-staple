@@ -59,6 +59,7 @@ module CorrectHorseBatteryStaple::Backend::Redis
 
     def open_database
       @db ||= begin
+                @gensym_id = 0
                 @length_key            = make_key("length_zset")
                 @percentile_key        = make_key("percentile_zset")
                 @frequency_key         = make_key("frequency_zset")
@@ -82,7 +83,7 @@ module CorrectHorseBatteryStaple::Backend::Redis
 
     def gensym_temp
       @_gensym_id ||= 0
-      make_key("TEMP_" + Process.pid + (@gensym_id += 1))
+      make_key("TEMP_#{Process.pid}_#{@gensym_id += 1}")
     end
   end
 end
