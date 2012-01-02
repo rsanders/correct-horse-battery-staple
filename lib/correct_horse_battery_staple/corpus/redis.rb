@@ -28,7 +28,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   end
 
   def size
-    @size ||= @db.execute("select count(*) from entries").first.first
+    @size ||= db.zcard(@percentile_key)
   end
 
 
@@ -46,8 +46,39 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
 
   ## optimized pick implementations - they do NOT support :filter, though
 
-  # def pick(count, options = {})
-  # end
+  def pick(count, options = {})
+    percentile_range = options[:percentile]
+    length_range     = options[:word_length]
+
+    if percentile_range && percentile_range.begin == 0 && percentile_range.end == 100
+      percentile_range = nil
+    end
+
+    if (!percentile_range && !length_range)
+      get_words_for_ids(pick_random_words(count))
+    else
+      sets = []
+      sets << get_words_in_zset(@percentile_key, percentile_range) if percentile_range
+      sets << get_words_in_zset(@length_key, length_range)         if length_range
+
+      get_words_for_ids(array_sample(sets.reduce {|a,b| a & b },count))
+    end
+  end
+
+  def pick_random_words(count)
+    count.times.map do
+      idx = random_number(size)-1
+      db.zrange(@percentile_key, idx, idx)[0]
+    end
+  end
+
+  def get_words_in_zset(key, range)
+    db.zrangebyscore(key, range.begin, range.end)
+  end
+
+  def get_words_for_ids(ids)
+    ids.map {|w| CorrectHorseBatteryStaple::Word.new(:word => w) }
+  end
 
   # def get_words_for_ids(ids)
   #   ids = Array(ids)
