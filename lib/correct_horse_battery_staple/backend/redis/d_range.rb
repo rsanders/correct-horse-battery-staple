@@ -1,3 +1,29 @@
+#
+# Represents a list of items corresponding to a square area of items
+# formed by a range on axis 1 and a range on axis 2 of numbers
+# associated with an item.  In other words, this composes two
+# different data about an item into a single score in a Redis sorted
+# set, and allow that area to be treated as a single logical ordered
+# list of items.
+#
+# This is used to construct a single score out of a word's length
+# and percentile ranking.  The length is the "outer" score and
+# ranges (generally) from 3..18 or thereabouts in integral steps.
+# Percentiles exist as fractional parts of the score added to the
+# base word length.  So, to address the items in a sorted set
+# with the word length from 5..8 and percentile range 20..30,
+# you would (in the Writer::Redis class) generate a Sorted set
+# in which every word has a score with an integer and fractional
+# part.  The word "the" which appeared in the 95th percentile would
+# have a score of 3.95.
+#
+# Once defined, this class allows the following operations:
+#
+# - counting the total # of items in the 2d bounding box
+# - picking the nth item from the (virtual) sorted list
+#
+#
+
 class CorrectHorseBatteryStaple::Backend::Redis::DRange
   include CorrectHorseBatteryStaple::Memoize
   def initialize(db, key, outer, inner, divisor=100)
@@ -15,13 +41,8 @@ class CorrectHorseBatteryStaple::Backend::Redis::DRange
       [min, max, cnt]
     end
   end
-  
+
   def count
-    # @db.multi do
-    #   iterate_ranges do |min, max|
-    #     zcount(min, max)
-    #   end
-    # end.reduce(:+)
     precache_counts
     @counts.values.reduce(:+)
   end
@@ -36,10 +57,8 @@ class CorrectHorseBatteryStaple::Backend::Redis::DRange
       cib = count_in_base(base)
       minpos = pos
       maxpos = pos + cib
-      # STDERR.puts "pos = #{pos}, cib = #{cib}, minpos = #{minpos}, maxpos = #{maxpos}, base = #{base}"
       if cib > 0 && n >= minpos && n <= maxpos
         (min, max) = minmax_for_base(base)
-        # STDERR.puts "   min = #{min}, max = #{max}, limit = [#{n-pos}, 1]"
         return @db.zrangebyscore(@key, min, max,
                                  :limit => [n-pos, 1])[0]
       end
