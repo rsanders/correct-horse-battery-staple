@@ -13,6 +13,6 @@ fi
 PROF=`which ruby-prof`
 
 export pick_strategy=drange
-bundle exec /usr/bin/time -l ruby -Ilib $PROF -f prof-$FORMAT-$CORPUS.html \
+bundle exec /usr/bin/time -l ruby -Ilib $PROF -f prof-$FORMAT-drange-$CORPUS.html \
     -p graph_html -- ./bin/chbs --trace generate -c tvscripts:127.0.0.1:6379.redis \
     -n $ITERATIONS > /dev/null

@@ -53,7 +53,7 @@ puts "\n*** Generating 100,000 words ***"
 word_count = 100_000
 
 Benchmark.bm(18) do |b|
-  ["redis", *@formats].each do |format|
+  [*@formats, "redis"].each do |format|
     if format == "sqlite"
       [ # "standard", "standard2",
        "rtree", "discrete", "discrete2"].each do |strategy|

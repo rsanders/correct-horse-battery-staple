@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'correct_horse_battery_staple'
+
+corpus = CorrectHorseBatteryStaple.load_corpus(ARGV[0] || "tvscripts")
+
+number_of_words = 4
+count = (ARGV[1] || 1000).to_i
+generator = CorrectHorseBatteryStaple::Generator.new(corpus)
+
+puts "Generating #{count} words"
+count.times do
+  generator.make(number_of_words)
+end
+
