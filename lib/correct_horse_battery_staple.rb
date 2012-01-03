@@ -1,7 +1,7 @@
 require 'logger'
 
 module CorrectHorseBatteryStaple
-  VERSION = '0.4.0'
+  VERSION = '0.5.0'
 
   DEFAULT_CORPUS_NAME = "tvscripts"
 
@@ -86,6 +86,11 @@ module CorrectHorseBatteryStaple
       l = array.length
       array.values_at(* count.times.map { random_number(l) })
     end
+
+    def set_sample(array, count)
+      l = array.length
+      array.values_at(* count.times.map { random_number(l) })
+    end
   end
 
   module Util
@@ -99,6 +104,7 @@ module CorrectHorseBatteryStaple
   end
 
   autoload :Word,               'correct_horse_battery_staple/word'
+  autoload :Stats,              'correct_horse_battery_staple/stats'
   autoload :Generator,          'correct_horse_battery_staple/generator'
   autoload :Corpus,             'correct_horse_battery_staple/corpus'
   autoload :Parser,             'correct_horse_battery_staple/parser'
@@ -109,7 +115,3 @@ module CorrectHorseBatteryStaple
   autoload :Memoize,            'correct_horse_battery_staple/memoize'
 end
 
-
-if __FILE__ == $0
-  puts CorrectHorseBatteryStaple.generate((ARGV[0] || 4).to_i)
-end

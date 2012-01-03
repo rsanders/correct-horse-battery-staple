@@ -1,7 +1,10 @@
 require 'bigdecimal'
 # require 'securerandom'
+require 'forwardable'
 
 class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpus
+  extend Forwardable
+  
   attr_accessor :frequency_mean, :frequency_stddev
   attr_accessor :probability_mean, :probability_stddev
   attr_accessor :original_size
