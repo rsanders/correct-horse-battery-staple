@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -z "$1" ]; then
+  REDIS=$1
+fi
+
+: ${REDIS:=127.0.0.1:6379}
+
+CONVERT="ruby -Ilib ./bin/chbs --trace convert --oformat redis "
+for file in corpus/*.json; do
+  basename=`basename $file .json`
+  dest="${basename}:${REDIS}"
+  echo "Loading $basename.json into $dest"
+  eval $CONVERT $file ${dest}.redis
+done
