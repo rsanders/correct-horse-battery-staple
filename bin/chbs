@@ -31,6 +31,7 @@ command :convert do |c|
   c.option '-S FIELD', '--sortby FIELD', 'Sort words by field'
   c.option '-R', '--randomize', 'Randomize word order'
   c.option '-l COUNT', '--limit COUNT', Integer, 'Set the maximum words processed'
+  c.option '-P', '--precache', 'Precache the source word list in memory'
 
   c.action do |args, options|
     options.default :limit => -1
@@ -110,8 +111,8 @@ command :generate do |c|
     count = options.repeat.to_i
 
     corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, options.format)
-    if count > 1
-      corpus.precache(4_000_000)
+    if options.precache
+      corpus.precache(16_000_000)
     end
     puts "loaded corpus!" if options.debug
     unfiltered_size = corpus.count
