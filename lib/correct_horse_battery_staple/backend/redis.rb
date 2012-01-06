@@ -45,6 +45,7 @@ module CorrectHorseBatteryStaple::Backend::Redis
     end
 
     def load_stats
+      #noinspection RubyHashKeysTypesInspection
       load_stats_from_hash Hash[db.hgetall(@stats_key).map {|k,v| [k, v.to_f]}]
     end
 

@@ -68,13 +68,13 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     @prelude = JSON.parse( prelude_buf.unpack("@8a#{@prelude_len}")[0] ) || {}
 
     # includes prefix length byte
-    @word_length      = @prelude["wlen"]     or raise "Word length is not defined!"
+    @word_length      = @prelude["wlen"]     || raise(ArgumentError, "Word length is not defined!")
 
     # as network byte order int
-    @frequency_length = @prelude["flen"]     or 4
+    @frequency_length = @prelude["flen"]     || 4
 
     # total length of record
-    @entry_length     = @prelude["entrylen"] or raise "Prelude does not include entrylen!"
+    @entry_length     = @prelude["entrylen"] || raise(ArgumentError, "Prelude does not include entrylen!")
 
     load_stats_from_hash(@prelude["stats"]) if @prelude["stats"]
 

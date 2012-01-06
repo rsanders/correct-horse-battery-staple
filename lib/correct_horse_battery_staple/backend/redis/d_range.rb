@@ -76,6 +76,7 @@ class CorrectHorseBatteryStaple::Backend::Redis::DRange
         zcount(*minmax_for_base(base))
       end
     end
+    #noinspection RubyHashKeysTypesInspection
     @counts = Hash[@outer.to_a.zip(counts)]
     @precached_counts = true
     @counts

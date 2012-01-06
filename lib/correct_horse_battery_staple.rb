@@ -9,6 +9,7 @@ module CorrectHorseBatteryStaple
 
   class << self
     attr_accessor :logger
+    attr_accessor :corpus_directory
   end
   self.logger = Logger.new(STDERR)
 
@@ -59,9 +60,6 @@ module CorrectHorseBatteryStaple
 
   protected
 
-  def self.corpus_directory
-    File.join(File.dirname(__FILE__), "../corpus")
-  end
 
   module Common
     def logger
@@ -113,5 +111,7 @@ module CorrectHorseBatteryStaple
   autoload :Writer,             'correct_horse_battery_staple/writer'
   autoload :Backend,            'correct_horse_battery_staple/backend'
   autoload :Memoize,            'correct_horse_battery_staple/memoize'
+
+  self.corpus_directory = File.join(File.dirname(__FILE__), "../corpus")
 end
 
