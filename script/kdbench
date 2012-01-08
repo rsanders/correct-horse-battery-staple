@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'kdtree'
+require 'json'
+require 'benchmark'
+require 'correct_horse_battery_staple'
+
+file = ARGV[0] || "corpus/size100.json"
+
+
+i = 0
+
+Benchmark.bm(20) do |b|
+  b.report('loading json') {
+    @jsdata = (JSON.parse(open(file).read))['corpus'] }
+  b.report('creating tree') {
+    @kdtree = KDTree.new(
+                    @jsdata.map {|w| [
+                                     w['word'].length.to_f,
+                                     w['percentile'].to_f,
+                                     i+=1
+                                    ]
+                                }
+                         )
+  }
+
+  b.report('serializing tree') {
+    @kdtree.persist(f = File.open("kdtree.saved", "w"))
+    f.close
+  }
+  b.report('loading tree') {
+    @kdtree2 = KDTree.new(File.open("kdtree.saved"))
+  }
+end
+
+
+ITERATIONS = (ARGV[1] || 100000).to_i
+
+srand(1000)
+
+def pick_indexes(num)
+  while (num-=1) > 0
+    rl = rand(7) + 3
+    rp = rand(0) * 0.5 + 0.3
+    n = @kdtree.nearest(rl, rp)
+    w = @jsdata[n]['word']
+  end
+end
+
+def pick_words(num)
+  while (num-=1) > 0
+    rl = rand(7) + 3
+    rp = rand(0) * 0.5 + 0.3
+    n = @kdtree.nearest(rl, rp)
+    CorrectHorseBatteryStaple::Word.new @jsdata[n]
+  end
+end
+
+puts "\n\n"
+
+Benchmark.bmbm do |b|
+  b.report('KD Nearest 1 Idx')   { pick_indexes(ITERATIONS) }
+  b.report('KD Nearest 1 Words') { pick_words(ITERATIONS) }
+end
+
+puts "\n"
+
+# -*- mode: Ruby -*-
