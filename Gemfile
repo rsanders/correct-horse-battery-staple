@@ -19,6 +19,9 @@ platform :jruby do
   gem "redis", ">= 2.2.0"  
 end
 
+gem "tupalo-kdtree"
+gem "algorithms"
+
 # cmdline
 gem "commander"
 platform :jruby do

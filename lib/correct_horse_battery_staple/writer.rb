@@ -21,7 +21,9 @@ class CorrectHorseBatteryStaple::Writer
   autoload :Json,     "correct_horse_battery_staple/writer/json"
   autoload :Csv,      "correct_horse_battery_staple/writer/csv"
   autoload :Isam,     "correct_horse_battery_staple/writer/isam"
+  autoload :Isamkd,   "correct_horse_battery_staple/writer/isam_kd"
   autoload :Marshal,  "correct_horse_battery_staple/writer/marshal"
   autoload :Sqlite,   "correct_horse_battery_staple/writer/sqlite"
   autoload :Redis,    "correct_horse_battery_staple/writer/redis"
+  # autoload :KDTree,   "correct_horse_battery_staple/writer/kdtree"
 end

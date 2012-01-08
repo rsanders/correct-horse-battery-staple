@@ -1,6 +1,8 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    algorithms (0.3.0)
+    algorithms (0.3.0-java)
     coderay (0.9.8)
     commander (4.0.6)
       highline (~> 1.5.0)
@@ -80,6 +82,7 @@ GEM
       httparty (>= 0.8.1)
       json
     thor (0.14.6)
+    tupalo-kdtree (0.2.3)
     yard (0.7.4)
 
 PLATFORMS
@@ -87,6 +90,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  algorithms
   commander
   fastercsv
   ffi-ncurses
@@ -107,3 +111,4 @@ DEPENDENCIES
   rubyforge
   sqlite3
   tddium
+  tupalo-kdtree

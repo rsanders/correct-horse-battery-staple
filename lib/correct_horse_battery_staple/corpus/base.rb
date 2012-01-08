@@ -14,6 +14,10 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   include CorrectHorseBatteryStaple::Memoize
   include Enumerable
 
+  def self.read(dest)
+    self.new dest
+  end
+  
   # you MUST override this method for Enumerable to use
 
   def each(&block)
