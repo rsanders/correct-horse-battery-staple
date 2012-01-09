@@ -210,8 +210,11 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
 
   def inspect
     <<INSPECT
-      Type: #{self.class.name}
-      Entry count: #{count}
+Type: #{self.class.name}
+Entry count: #{count}
+
+Stats:
+#{stats.map {|k,v| "  #{k}: #{v}\n" }.join("") }
 INSPECT
   end
   

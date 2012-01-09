@@ -134,12 +134,15 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
     #
     # Contents of Prelude (after JSON decoding):
     #
-    # P["wlen"]     - length of word part of record
-    # P["flen"]     - length of frequency part of record (always 4 bytes)
-    # P["entrylen"] - length of total part of record
-    # P["n"]        - number of records
-    # P["sort"]     - field name sorted by (word or frequency)
-    # P["stats"]    - corpus statistics
+    # P["wlen"]                   - length of word part of record
+    # P["flen"]                   - length of frequency part of record (always 4 bytes)
+    # P["entrylen"]               - length of total part of record
+    # P["n"]                      - number of records
+    # P["sort"]                   - field name sorted by (word or frequency)
+    # P["stats"]                  - corpus statistics
+    # P["offset_index1"]          - absolute file offset of KDTree index
+    # P["records_length"]         - length in bytes of records section, excluding padding
+    # P["length_scaling_factor"]  - what length was multiplied by in creating KDTree (usually 15)
     #
     # Format of record:
     #
@@ -147,12 +150,9 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
     # P["wlen"] bytes      - LW bytes of word (W) + P["wlen"]-LW bytes of padding
     # P["flen"] (4) bytes  - frequency as network byte order long
     #
-
-    # def initialize(filename, stats = nil)
-    #   @filename = filename
-    #   @file = CorrectHorseBatteryStaple::Util.open_binary(filename, "r")
-    #   parse_prelude
-    # end
+    # After record section, there is padding up to the next page_size boundary,
+    # and then there is a dumped KDTree.
+    #
 
     def precache(max = -1)
       return if max > -1 && file_size(@file) > max
@@ -205,8 +205,12 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       @prelude
     end
 
+    #
+    # Show some information about 
+    #
     def inspect
       super + "\n" + <<INSPECT
+File size: #{file_size(@file)}
 Word length: #{@word_length}
 Frequency bytes: #{@frequency_length}
 Total record bytes: #{@records_length}
@@ -214,7 +218,8 @@ Offset of K-D Tree index: #{@offset_index1}
 Total K-D Tree index bytes: #{file_size(@file) - @offset_index1}
 K-D Tree Signature: #{file_range_read(@offset_index1..(@offset_index1+3))}
 
-Prelude: #{@prelude}
+Prelude:
+#{@prelude.map {|k,v| k=="stats" ? "" : "  #{k}: #{v}\n" }.join("") }
 INSPECT
     end
     
