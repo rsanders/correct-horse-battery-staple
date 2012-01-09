@@ -1,6 +1,6 @@
 #!/bin/sh
 
-formats="json csv isam marshal"
+formats="json csv isam isamkd marshal"
 
 if ! ruby -v | grep -q jruby; then
   formats="$formats sqlite"
@@ -23,3 +23,12 @@ for format in $formats; do
     eval $CONVERT corpus/size100.json corpus/size100.$format
   fi
 done
+
+if [ -r "corpus/coca500k.json" ]; then
+  echo "Converting coca500k.json corpus to all formats..."
+  for format in $formats; do
+    if [ $format != "json" ]; then
+      eval $CONVERT corpus/coca500k.json corpus/coca500k.$format
+    fi
+  done
+fi
