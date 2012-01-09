@@ -86,6 +86,16 @@ command :stats do |c|
   end
 end
 
+command :inspect do |c|
+  c.syntax = 'inspect <corpusfile>'
+  c.summary = 'Show implementation information for a corpus'
+
+  c.action do |args,options|
+    corpus = CorrectHorseBatteryStaple::Corpus.read(args[0])
+    puts corpus.inspect
+  end
+end
+
 command :generate do |c|
   c.syntax = 'generate [<number of words>]'
   c.summary = 'Generate a passphrase with a given number of words'

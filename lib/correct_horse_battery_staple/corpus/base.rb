@@ -204,6 +204,13 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
       :weighted_size => weighted_size.to_f}
   end
 
+  def inspect
+    <<INSPECT
+      Type: #{self.class.name}
+      Entry count: #{count}
+INSPECT
+  end
+  
   alias :length :count
 
 

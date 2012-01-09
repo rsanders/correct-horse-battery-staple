@@ -194,6 +194,19 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       @prelude
     end
 
+    def inspect
+      super + "\n" + <<INSPECT
+Word length: #{@word_length}
+Frequency bytes: #{@frequency_length}
+Total record bytes: #{@records_length}
+Offset of K-D Tree index: #{@offset_index1}
+Total K-D Tree index bytes: #{file_size(@file) - @offset_index1}
+K-D Tree Signature: #{file_range_read(@offset_index1..(@offset_index1+3))}
+
+Prelude: #{@prelude}
+INSPECT
+    end
+    
     def load_kdtree
       # @file.seek(@offset_index1)
       # STDERR.puts "sig is #{@file.read(4)}"
@@ -244,11 +257,24 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       string[@entry_length * n, @entry_length]
     end
 
-    def get_word_by_idx(i)
-      chunk = nth_chunk(i, records_string)
+    def pos_of_nth_word_in_file(n)
+      pos = @record_offset + (n * @entry_length)
+    end
+    
+    #
+    # this is much slower than the original below
+    #
+    # def get_word_by_idx_direct(n)
+    #   @file.seek(pos_of_nth_word_in_file(n))
+    #   chunk = @file.read(@entry_length)
+    #   parse_record(chunk)
+    # end
+
+    def get_word_by_idx(n)
+      chunk = nth_chunk(n, records_string)
       parse_record(chunk)
     end
-
+    
     ## some core Enumerable building blocks
 
     def each(&block)
@@ -298,7 +324,7 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
         end
         iterations += 1
       end
-      STDERR.puts "iterations was #{iterations}" if iterations > count+1
+      # STDERR.puts "iterations was #{iterations}" if iterations > count+1
 
       # validate that we succeeded
       raise "Cannot find #{count} words matching criteria" if result.length < count
