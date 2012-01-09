@@ -151,7 +151,8 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
     # P["flen"] (4) bytes  - frequency as network byte order long
     #
     # After record section, there is padding up to the next page_size boundary,
-    # and then there is a dumped KDTree.
+    # and then there is a dumped KDTree which extends to EOF.
+    #
     #
 
     def precache(max = -1)
