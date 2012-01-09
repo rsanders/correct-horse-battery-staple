@@ -5,7 +5,7 @@ gem "fastercsv", :platforms => [:mri_18, :jruby]
 gem "json"
 
 # performance
-gem "memoizable"
+# gem "memoizable"
 
 # external DBs
 gem "sqlite3", :platforms => [:mri]
@@ -20,7 +20,6 @@ platform :jruby do
 end
 
 gem "tupalo-kdtree"
-gem "algorithms"
 
 # cmdline
 gem "commander"

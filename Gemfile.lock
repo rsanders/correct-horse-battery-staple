@@ -1,8 +1,6 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    algorithms (0.3.0)
-    algorithms (0.3.0-java)
     coderay (0.9.8)
     commander (4.0.6)
       highline (~> 1.5.0)
@@ -34,7 +32,6 @@ GEM
     json (1.6.1)
     json (1.6.1-java)
     json_pure (1.6.3)
-    memoizable (0.1.0)
     method_source (0.6.6)
       ruby_parser (~> 2.0.5)
     multi_json (1.0.4)
@@ -90,7 +87,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  algorithms
   commander
   fastercsv
   ffi-ncurses
@@ -102,7 +98,6 @@ DEPENDENCIES
   hoe-git
   hoe-yard
   json
-  memoizable
   pry
   rdoc
   redis (>= 2.2.0)

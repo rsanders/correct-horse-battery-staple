@@ -9,11 +9,13 @@ bin/chbs-mkpass
 lib/correct_horse_battery_staple.rb
 lib/correct_horse_battery_staple/assembler.rb
 lib/correct_horse_battery_staple/backend.rb
+lib/correct_horse_battery_staple/backend/isam_kd.rb
 lib/correct_horse_battery_staple/backend/redis.rb
 lib/correct_horse_battery_staple/backend/redis/d_range.rb
 lib/correct_horse_battery_staple/corpus.rb
 lib/correct_horse_battery_staple/corpus/base.rb
 lib/correct_horse_battery_staple/corpus/isam.rb
+lib/correct_horse_battery_staple/corpus/isam_kd.rb
 lib/correct_horse_battery_staple/corpus/redis.rb
 lib/correct_horse_battery_staple/corpus/redis2.rb
 lib/correct_horse_battery_staple/corpus/serialized.rb
@@ -32,6 +34,7 @@ lib/correct_horse_battery_staple/writer/base.rb
 lib/correct_horse_battery_staple/writer/csv.rb
 lib/correct_horse_battery_staple/writer/file.rb
 lib/correct_horse_battery_staple/writer/isam.rb
+lib/correct_horse_battery_staple/writer/isam_kd.rb
 lib/correct_horse_battery_staple/writer/json.rb
 lib/correct_horse_battery_staple/writer/marshal.rb
 lib/correct_horse_battery_staple/writer/redis.rb
