@@ -5,6 +5,7 @@ class CorrectHorseBatteryStaple::Corpus::Sqlite < CorrectHorseBatteryStaple::Cor
   MAX_ITERATIONS = 1000
 
   def initialize(file)
+    super
     @db = SQLite3::Database.open file
     @statements = []
     load_stats

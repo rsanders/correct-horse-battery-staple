@@ -17,6 +17,14 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
   end
 
   module InstanceMethods
+    #
+    # 
+    #
+    def initialize_backend_variables
+      @length_scaling_factor = 15
+      @page_size = 4096
+    end
+
     def fix_stats(stats)
       stats.each do |k,v|
         if v.respond_to?(:nan?) && v.nan?
@@ -27,7 +35,7 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
     end
 
     def page_size
-      4096
+      @page_size || 4096
     end
 
     # many MMUs in default mode and modern highcap drives have 4k pages/blocks
@@ -54,6 +62,7 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
         "n"              => corpus_word_count,
         "stats"          => stats,
         "flags"          => 0,
+        "length_scaling_factor" => (@length_scaling_factor || 15),
         "records_length" => "0000000000",
         "offset_records" => "0000000000",
         "offset_index1"  => "0000000000",
@@ -101,7 +110,7 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
     # make the search space more square by increasing the length of
     # the "word length" axis
     def len2coord(len)
-      len * 10
+      len * (@length_scaling_factor || 10)
     end
     
     def binwrite(*args)
@@ -188,6 +197,8 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       @records_length   = @prelude["records_length"] || raise(ArgumentError, "No records length!")
 
       @entry_count      = @prelude["n"] || raise(ArgumentError, "Number of records not included!")
+
+      @length_scaling_factor = @prelude["length_scaling_factor"] || 10
       
       load_stats_from_hash(@prelude["stats"]) if @prelude["stats"]
 
@@ -208,9 +219,6 @@ INSPECT
     end
     
     def load_kdtree
-      # @file.seek(@offset_index1)
-      # STDERR.puts "sig is #{@file.read(4)}"
-
       @file.seek(@offset_index1)
       KDTree.new @file
     end

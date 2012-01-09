@@ -13,6 +13,7 @@ class CorrectHorseBatteryStaple::Corpus::Serialized < CorrectHorseBatteryStaple:
   end
 
   def initialize(table, stats = nil)
+    super
     @table   = CorrectHorseBatteryStaple::StatisticalArray.cast(table.sort, true)
     @stats   = stats
     @filters = []

@@ -12,6 +12,7 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
   attr_accessor :options
 
   def initialize(dest)
+    super
     self.dest    = dest
     self.options = {}
     parse_uri(dest)

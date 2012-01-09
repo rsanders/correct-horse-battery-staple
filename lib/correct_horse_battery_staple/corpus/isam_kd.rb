@@ -32,6 +32,7 @@ class CorrectHorseBatteryStaple::Corpus::IsamKD < CorrectHorseBatteryStaple::Cor
   include CorrectHorseBatteryStaple::Backend::IsamKD
 
   def initialize(filename, stats = nil)
+    super
     @filename = filename
     @file = CorrectHorseBatteryStaple::Util.open_binary(filename, "r")
     parse_prelude

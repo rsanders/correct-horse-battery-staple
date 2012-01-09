@@ -33,6 +33,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
   INITIAL_PRELUDE_LENGTH = 512
 
   def initialize(filename, stats = nil)
+    super
     @filename = filename
     @file = CorrectHorseBatteryStaple::Util.open_binary(filename, "r")
     parse_prelude

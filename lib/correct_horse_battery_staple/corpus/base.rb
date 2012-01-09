@@ -14,6 +14,10 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   include CorrectHorseBatteryStaple::Memoize
   include Enumerable
 
+  def initialize(*args)
+    initialize_backend_variables if respond_to?(:initialize_backend_variables)
+  end
+  
   def self.read(dest)
     self.new dest
   end
