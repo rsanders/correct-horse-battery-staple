@@ -88,7 +88,7 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       i = -1
       k = KDTree.new(
                      corpus.entries.map {|w| [
-                                              w.word.length.to_f,
+                                              len2coord(w.word.length.to_f),
                                               w.percentile.to_f,
                                               i+=1
                                              ]
@@ -98,6 +98,12 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       k.persist(io)
     end
 
+    # make the search space more square by increasing the length of
+    # the "word length" axis
+    def len2coord(len)
+      len * 10
+    end
+    
     def binwrite(*args)
       method = io.respond_to?(:binwrite) ? :binwrite : :write
       io.send(method, *args)
@@ -275,16 +281,24 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       raise NotImplementedError, "ISAM does not support :filter option" if options[:filter]
 
       result = []
+      found_indexes = []
       iterations = 0
-      while result.size < count && iterations < 100
+      while result.size < count && iterations < 1000
         len = random_in_range(options[:word_length])
         pct = random_in_range(options[:percentile])
-        word_idx = @kdtree.nearest(len, pct)
-        word = get_word_by_idx(word_idx)
-        result << word if options[:word_length].include?(word.word.length)
+        word_idx = @kdtree.nearest(len2coord(len), pct)
+        unless found_indexes.include?(word_idx)
+          found_indexes << word_idx
+          word = get_word_by_idx(word_idx)
+          if options[:word_length].include?(word.word.length)
+            result << word
+          else
+            STDERR.puts "non-qualifying word: #{word.word.length}"
+          end
+        end
         iterations += 1
       end
-      # STDERR.puts "iterations was #{iterations}"
+      STDERR.puts "iterations was #{iterations}" if iterations > count+1
 
       # validate that we succeeded
       raise "Cannot find #{count} words matching criteria" if result.length < count

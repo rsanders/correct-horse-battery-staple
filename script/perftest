@@ -5,7 +5,7 @@ require 'benchmark'
 
 @generators = {}
 @corpuses = {}
-@formats = %w[isam marshal json sqlite]
+@formats = %w[isam isamkd marshal json sqlite]
 
 def load_corpus(format, corpus = "tvscripts")
   corpus = CorrectHorseBatteryStaple.load_corpus(corpus, format)
