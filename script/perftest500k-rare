@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby -Ilib
+
+require 'correct_horse_battery_staple'
+require 'benchmark'
+
+ITERATIONS=1000000
+
+@generators = {}
+@corpuses = {}
+@formats = %w[isam isamkd marshal json sqlite]
+
+def load_corpus(format, corpus = "coca500k")
+  corpus = CorrectHorseBatteryStaple.load_corpus(corpus, format)
+  @corpuses[format] = corpus
+  @generators[format] = CorrectHorseBatteryStaple::Generator.new(corpus)
+end
+
+def generate_many(format, count = ITERATIONS, corpus = "coca500k")
+  generator = @generators[format]
+  word_length = 3..9
+  percentile = 30..80
+  number_of_words = 4
+
+  count.times do
+    generator.make(number_of_words,
+                   :word_length => word_length,
+                   :percentile => percentile)
+  end
+end
+
+def generate_many_redis(uri, count = ITERATIONS, strategy = nil)
+  ENV['pick_strategy'] = strategy
+  format = uri.include?('.redis2') ? 'redis2' : 'redis'
+  generator = CorrectHorseBatteryStaple::Generator.new CorrectHorseBatteryStaple.load_corpus(uri, format)
+  word_length = 12..13
+  percentile = 20..90
+  #word_length = 3..9
+  #percentile = 30..80
+  number_of_words = 4
+
+  count.times do
+    generator.make(number_of_words,
+                   :word_length => word_length,
+                   :percentile => percentile)
+  end
+  ENV.delete('pick_strategy')
+end
+
+puts "*** Loading Corpus ***"
+Benchmark.bmbm do |b|
+  @formats.each do |format|
+    b.report("#{format}") { load_corpus(format) }
+  end
+end
+
+puts "\n*** Generating #{ITERATIONS} words ***"
+
+Benchmark.bm(18) do |b|
+  [*@formats].each do |format|
+    if format == "sqlite"
+      [ # "standard", "standard2",
+       "rtree", "discrete", "discrete2"].each do |strategy|
+        b.report("#{format} (#{strategy})") do
+          ENV['pick_strategy'] = strategy
+          generate_many(format)
+        end
+      end
+      ENV.delete('pick_strategy')
+    elsif format == "redis"
+      b.report("redis dr")   { generate_many_redis("coca500k:127.0.0.1:6379.redis", ITERATIONS, "drange") }
+      # b.report("redis2")     { generate_many_redis("tvscripts:127.0.0.1:6379.redis2", 10_000) }
+      # b.report("redis std")  { generate_many_redis("tvscripts:127.0.0.1:6379.redis", 10_000) }
+    else
+      b.report("#{format}") { generate_many(format) }
+    end
+  end
+end
