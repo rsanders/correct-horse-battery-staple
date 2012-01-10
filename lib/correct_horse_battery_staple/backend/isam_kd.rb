@@ -25,6 +25,8 @@ module CorrectHorseBatteryStaple::Backend::IsamKD
       @page_size = 4096
     end
 
+
+
     def fix_stats(stats)
       stats.each do |k,v|
         if v.respond_to?(:nan?) && v.nan?
@@ -229,6 +231,7 @@ INSPECT
       KDTree.new @file
     end
 
+
     ## parsing
 
     #
@@ -310,7 +313,7 @@ INSPECT
       @entry_count ||= records_size / @entry_length
     end
 
-    
+  
     ## our Corpus Enumerablish abstract methods
 
     # we presume that the ISAM file has been sorted
@@ -318,7 +321,7 @@ INSPECT
       @sorted_entries ||= entries
     end
 
-    
+    
     ## optimized pick - does NOT support :filter, though
     def pick(count, options = {})
       # incompat check
@@ -345,7 +348,6 @@ INSPECT
         end
         iterations += 1
       end
-     # STDERR.puts "iterations was #{iterations}" if iterations > count+1
 
       # validate that we succeeded
       raise "Cannot find #{count} words matching criteria" if result.length < count
@@ -353,7 +355,7 @@ INSPECT
       result
     end
 
-
+
     
     ## file I/O
 
@@ -392,7 +394,7 @@ INSPECT
       record_range_read(record_range)
     end
 
-    
+    
     ## rather than using a StatisticalArray, we do direct indexing into the file/string
     def percentile_index(percentile, round=true)
       r = percentile.to_f/100 * count + 0.5
