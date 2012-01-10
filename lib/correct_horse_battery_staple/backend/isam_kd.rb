@@ -276,7 +276,8 @@ INSPECT
     end
     
     #
-    # this is much slower than the original below
+    # this version is much slower than the other - 1.5x total runtime
+    # slower in some cases.
     #
     # def get_word_by_idx_direct(n)
     #   @file.seek(pos_of_nth_word_in_file(n))
@@ -286,7 +287,10 @@ INSPECT
 
     def get_word_by_idx(n)
       chunk = nth_chunk(n, records_string)
-      parse_record(chunk)
+      parse_record(chunk).tap do |w|
+        w.index      = n
+        w.percentile = (n-0.5)/size * 100
+      end
     end
     
     ## some core Enumerable building blocks
@@ -320,10 +324,13 @@ INSPECT
       # incompat check
       raise NotImplementedError, "ISAM does not support :filter option" if options[:filter]
 
+      options = {:percentile  => 0..100,
+                 :word_length => 0..20}.merge(options)
+      
       result = []
       found_indexes = []
       iterations = 0
-      while result.size < count && iterations < 1000
+      while (result.size < count && iterations < 1000)
         len = random_in_range(options[:word_length])
         pct = random_in_range(options[:percentile])
         word_idx = @kdtree.nearest(len2coord(len), pct)
@@ -338,7 +345,7 @@ INSPECT
         end
         iterations += 1
       end
-      # STDERR.puts "iterations was #{iterations}" if iterations > count+1
+     # STDERR.puts "iterations was #{iterations}" if iterations > count+1
 
       # validate that we succeeded
       raise "Cannot find #{count} words matching criteria" if result.length < count
