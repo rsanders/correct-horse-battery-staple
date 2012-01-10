@@ -16,8 +16,17 @@ logger = Logger.new(STDERR)
 default_command :generate
 
 command :repl do |c|
+  c.syntax = 'repl'
+  c.summary = 'Open Pry-based REPL, optionally with a loaded corpus'
+  c.option '-c CORPUSFILE', '--corpus CORPUSFILE', "File to use as the source corpus"
   c.action do |args, options|
     require 'pry'
+
+    if options.corpus
+      format = CorrectHorseBatteryStaple::Corpus.format_for(options.corpus)
+      corpus = CorrectHorseBatteryStaple.load_corpus(options.corpus, format)
+    end
+    
     binding.pry
   end
 end
