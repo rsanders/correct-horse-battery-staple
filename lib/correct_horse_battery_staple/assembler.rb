@@ -39,23 +39,6 @@ class CorrectHorseBatteryStaple::Assembler
   def corpus
     @corpus ||= CorrectHorseBatteryStaple::Corpus::Serialized.new(self.words).tap do |corpus|
       corpus.recalculate
-      # stats              = corpus.stats
-      # size               = corpus.count
-      # frequency_mean     = corpus.frequency_mean
-      # frequency_stddev   = corpus.frequency_stddev
-      # weighted_size      = corpus.weighted_size
-      # probability_mean   = corpus.probability_mean
-      # probability_stddev = corpus.probability_stddev
-
-      # corpus.each_with_index do |entry, index|
-      #   entry.rank                      = size - index
-      #   entry.distance                  = (entry.frequency-frequency_mean)/frequency_stddev
-      #   entry.probability               = entry.frequency / weighted_size
-      #   entry.distance_probability      = (entry.probability - probability_mean) / probability_stddev
-      #   entry.percentile                = (index-0.5)/size * 100
-      # end
-
-      # corpus.recalculate
     end
   end
 
