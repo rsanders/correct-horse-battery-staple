@@ -39,7 +39,7 @@ end
 
 task :corpus => "chbs:corpus"
 
-["gem", "spec", "install_gem"].each do |task|
+["spec"].each do |task|
   Rake::Task[task].prerequisites.unshift "chbs:corpus"
 end
 task :clean => "chbs:clean"
