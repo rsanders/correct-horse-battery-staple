@@ -1,3 +1,5 @@
+require 'thread'
+
 module CorrectHorseBatteryStaple::Memoize
   def self.included(base)
     base.extend ClassMethods
@@ -9,16 +11,19 @@ module CorrectHorseBatteryStaple::Memoize
       miss_object = Object.new
       alias_method old_method, method
       define_method method do |*args, &block|
+        @_memoize_mutex ||= Mutex.new
         @_memoize_cache ||= {}
-        methcache = (@_memoize_cache[method] ||= {})
-        if block
-          raise ArgumentError, "You cannot call a memoized method with a block! #{method}"
+        @_memoize_mutex.synchronize do
+          methcache = (@_memoize_cache[method] ||= {})
+          if block
+            raise ArgumentError, "You cannot call a memoized method with a block! #{method}"
+          end
+          value = methcache.fetch(args, miss_object)
+          if value === miss_object
+            value = methcache[args] = send(old_method, *args)
+          end
+          value
         end
-        value = methcache.fetch(args, miss_object)
-        if value === miss_object
-          value = methcache[args] = send(old_method, *args)
-        end
-        value
       end
     end
   end
