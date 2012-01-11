@@ -142,7 +142,6 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     end
   end
 
-  def count; size; end
   def size
     @size ||= records_size / @entry_length
   end

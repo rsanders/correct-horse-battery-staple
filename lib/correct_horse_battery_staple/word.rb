@@ -80,11 +80,23 @@ class CorrectHorseBatteryStaple::Word
     self
   end
 
+
+
   def [](attr)
     send(attr.to_s)
   end
 
   def []=(attr, value)
     send("#{attr}=", value)
+  end
+
+
+
+  def eql?(other)
+    self.word == other.word
+  end
+
+  def ==(other)
+    self.word == other.word
   end
 end

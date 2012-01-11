@@ -30,12 +30,12 @@ class CorrectHorseBatteryStaple::Corpus::Redis < CorrectHorseBatteryStaple::Corp
     entries.each &block
   end
 
-  def count
-    @count ||= db.zcard(@words_key)
+  def count_all
+    @count_all ||= db.zcard(@words_key)
   end
 
   def size
-    stats[:size] || count
+    stats[:size] || count_all
   end
 
 

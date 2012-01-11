@@ -308,7 +308,6 @@ INSPECT
       end
     end
 
-    def count; size; end
     def size
       @entry_count ||= records_size / @entry_length
     end

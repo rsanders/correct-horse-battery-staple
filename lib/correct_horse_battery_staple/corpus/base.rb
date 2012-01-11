@@ -39,6 +39,14 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   #  frequencies
   #
 
+  def count(*args, &block)
+    if args.length > 0 || block
+      super(*args, &block)
+    else
+      size
+    end 
+  end
+  
 
   def sorted_entries
     entries.sort
