@@ -293,7 +293,7 @@ INSPECT
     filters.empty? ? nil : compose_filters(filters)
   end
   # memoize :filter_for_options
-
+  public :filter_for_options
 end
 
 # Random.srand(SecureRandom.random_number)
