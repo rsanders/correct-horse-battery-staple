@@ -292,7 +292,7 @@ INSPECT
       chunk = nth_chunk(n, records_string)
       parse_record(chunk).tap do |w|
         w.index      = n
-        w.percentile = (n-0.5)/size * 100
+        w.percentile = [(n-0.5)/size,0].max * 100
       end
     end
     
@@ -303,7 +303,10 @@ INSPECT
       max_index = size - 1
       index = 0
       while index < max_index
-        yield parse_record(string, index)
+        word = parse_record(string, index)
+        word.index = index
+        word.percentile = [(index-0.5)/size,0].max * 100
+        yield word
         index += 1
       end
     end

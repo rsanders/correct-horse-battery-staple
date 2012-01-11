@@ -48,6 +48,15 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   end
   
 
+  def count_by_options(options = {})
+    if options.empty?
+      count
+    else
+      count &filter_for_options(options)
+    end
+  end
+  memoize :count_by_options
+
   def sorted_entries
     entries.sort
   end
@@ -136,8 +145,12 @@ class CorrectHorseBatteryStaple::Corpus::Base < CorrectHorseBatteryStaple::Corpu
   end
   memoize :frequencies
 
-  def entropy_per_word
-    Math.log(count) / Math.log(2)
+  def entropy_per_word(options = {})
+    Math.log(count_by_options(options)) / Math.log(2)
+  end
+  
+  def entropy_per_word_by_filter(&filter)
+    Math.log(filter ? count(&filter) : size) / Math.log(2)
   end
 
   # filtering
@@ -279,7 +292,7 @@ INSPECT
 
     filters.empty? ? nil : compose_filters(filters)
   end
-  memoize :filter_for_options
+  # memoize :filter_for_options
 
 end
 
