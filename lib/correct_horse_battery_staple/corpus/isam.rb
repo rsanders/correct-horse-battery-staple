@@ -167,7 +167,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
     max_iterations = [options[:max_iterations] || 1000, count*10].max
 
     if range_size < count
-      raise ArgumentError, "Percentile range contains fewer words than requested count"
+      raise ArgumentError, "Percentile range contains fewer words than requested count: p=#{options[:percentile].inspect}, l=#{string.length}, el=#{@entry_length}, range_size = #{range_size}"
     end
 
     # the real work
@@ -233,7 +233,7 @@ class CorrectHorseBatteryStaple::Corpus::Isam < CorrectHorseBatteryStaple::Corpu
 
   def record_range_read(record_range = nil)
     record_range ||= 0...records_size
-    file_range_read((record_range.first + @record_offset)...(range_count(record_range) + @record_offset))
+    file_range_read((record_range.first + @record_offset)...(record_range.first + range_count(record_range) + @record_offset))
   end
   # memoize :record_range_read
 
