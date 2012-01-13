@@ -9,6 +9,7 @@ bin/chbs-mkpass
 lib/correct_horse_battery_staple.rb
 lib/correct_horse_battery_staple/assembler.rb
 lib/correct_horse_battery_staple/backend.rb
+lib/correct_horse_battery_staple/backend/isam.rb
 lib/correct_horse_battery_staple/backend/isam_kd.rb
 lib/correct_horse_battery_staple/backend/redis.rb
 lib/correct_horse_battery_staple/backend/redis/d_range.rb
