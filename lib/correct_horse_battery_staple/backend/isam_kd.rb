@@ -335,7 +335,8 @@ INSPECT
       result = []
       found_indexes = []
       iterations = 0
-      while (result.size < count && iterations < 1000)
+      max_iterations = [1000, 4 * count].max
+      while (result.size < count && iterations < max_iterations)
         len = random_in_range(options[:word_length])
         pct = random_in_range(options[:percentile])
         word_idx = @kdtree.nearest(len2coord(len), pct)
