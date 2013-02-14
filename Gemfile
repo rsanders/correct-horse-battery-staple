@@ -8,7 +8,6 @@ gem "json"
 # gem "memoizable"
 
 # external DBs
-gem "sqlite3", :platforms => [:mri]
 
 platform :mri do
   gem "hiredis"
@@ -28,6 +27,10 @@ platform :jruby do
 end
 
 gem "rdoc"
+
+group :test, :development do
+  gem "sqlite3", :platforms => [:mri]
+end
 
 group :test do
   gem "rspec"
