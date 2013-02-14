@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="gem" pattern="file:*/&amp;&amp;!file:.idea//*&amp;&amp;!file:data/wiktionary/gutenberg2005//*&amp;&amp;!file:data/wiktionary/tv-and-movies//*&amp;&amp;!file:data/wordfreq/eWC//*&amp;&amp;!file:data/wordfreq/toplemmas//*&amp;&amp;!file:corpus//*&amp;&amp;!file:config//*&amp;&amp;!file:pkg//*&amp;&amp;!file:prof//*&amp;&amp;!file:prof/20120102//*&amp;&amp;!file:spec//*&amp;&amp;!file:spec/corpus//*&amp;&amp;!file:spec/fixtures//*&amp;&amp;!file:spec/support//*&amp;&amp;!file:.autotest&amp;&amp;!file:.gemtest&amp;&amp;!file:.gitignore&amp;&amp;!file:.rvmrc&amp;&amp;!file:.tddium&amp;&amp;!file:.tddium-deploy-key&amp;&amp;!file:.travis.yml&amp;&amp;!file:Gemfile&amp;&amp;!file:Gemfile.lock" />
-</component>

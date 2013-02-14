@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="spec" pattern="file:spec//*||file:corpus//*||file:data/wiktionary/gutenberg2005//*||file:data/wiktionary/tv-and-movies//*||file:data/wordfreq/eWC//*||file:data/wordfreq/toplemmas//*||file:script//*||file:.autotest||file:.gemtest||file:.tddium||file:.tddium-deploy-key||file:.travis.yml" />
-</component>
