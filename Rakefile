@@ -18,9 +18,10 @@ Hoe.spec 'correct-horse-battery-staple' do
   dependency 'commander', '>= 4.0'
   dependency 'fastercsv', '>= 1.5.3'
   dependency 'json', '>= 1.6.0'
-  dependency 'redis', '>= 2.2.2'
-  dependency 'hiredis', '>= 0.4.0'
-  dependency 'tupalo-kdtree', '>= 0.2.3'
+  ## these are all optional
+  # dependency 'redis', '>= 2.2.2'
+  # dependency 'hiredis', '>= 0.4.0'
+  # dependency 'tupalo-kdtree', '>= 0.2.3'
   # dependency 'sqlite3', '>= 1.3.0'
 end
 

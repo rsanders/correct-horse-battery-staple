@@ -9,17 +9,6 @@ gem "json"
 
 # external DBs
 
-platform :mri do
-  gem "hiredis"
-  gem "redis", ">= 2.2.0" # , :require => ["redis", "redis/connection/hiredis"]
-end
-
-platform :jruby do
-  gem "redis", ">= 2.2.0"  
-end
-
-gem "tupalo-kdtree"
-
 # cmdline
 gem "commander"
 platform :jruby do
@@ -29,7 +18,10 @@ end
 gem "rdoc"
 
 group :test, :development do
-  gem "sqlite3", :platforms => [:mri]
+  gem "sqlite3", '>= 1.3.0', :platforms => [:mri]
+  gem 'redis', '>= 2.2.2'
+  gem 'hiredis', '>= 0.4.0', :platforms => [:mri]
+  gem 'tupalo-kdtree', '>= 0.2.3'
 end
 
 group :test do
@@ -50,7 +42,4 @@ group :development do
   gem "hoe-debugging"
 
   gem "ruby-prof", :platforms => [:mri]
-
-  # CI
-  gem "tddium"
 end
