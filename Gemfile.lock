@@ -1,3 +1,15 @@
+PATH
+  remote: .
+  specs:
+    correct-horse-battery-staple (0.6.4.20120113111503)
+      commander (>= 4.0)
+      fastercsv (>= 1.5.3)
+      hiredis (>= 0.4.0)
+      json (>= 1.6.0)
+      redis (>= 2.2.2)
+      sqlite3 (>= 1.3.0)
+      tupalo-kdtree (>= 0.2.3)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -73,6 +85,7 @@ PLATFORMS
 
 DEPENDENCIES
   commander
+  correct-horse-battery-staple!
   fastercsv
   ffi-ncurses
   hiredis (>= 0.4.0)
