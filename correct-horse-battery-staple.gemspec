@@ -18,7 +18,6 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubyforge_project = "correct-horse-battery-staple"
   s.rubygems_version = "1.8.10"
-  s.signing_key = "/Users/robertsanders/.gem/gem-private_key.pem"
   s.summary = "Generate a 4 word password from words of size 3-8 characters, with frequencies in the 30th-60th percentile"
 
   if s.respond_to? :specification_version then
